@@ -1,0 +1,295 @@
+// Fonts
+@import url(https://fonts.googleapis.com/css?family=Raleway:300,400,600);
+
+// Variables
+@import "variables";
+
+// Bootstrap
+@import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
+
+#loading_screen {
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.35);
+  position: fixed;
+  z-index: 9999;
+  overflow: hidden;
+  background-image: url(../images/loading.svg);
+  background-repeat: no-repeat;
+  background-position: center center;
+  display: none;
+}
+
+#success-message {
+  width: 100%;
+  margin: 0 auto;
+  position: absolute;
+  left: 0;
+  top: 70px;
+  padding: 0 5%;
+  z-index: 9999;
+}
+
+.glyphicon-refresh-animate {
+  animation: spin2 1.0s infinite linear;
+  -webkit-animation: spin2 1.0s infinite linear;
+}
+@-webkit-keyframes spin2 {
+  from {-webkit-transform: rotate(0deg);}
+  to {-webkit-transform: rotate(360deg);}
+}
+
+.table {
+  background-color: white;
+  width: auto;
+  text-align: center;
+  padding: 0 15px;
+  display: block;
+  .table_header {
+    background-color: #786e64;
+    color: white;
+    font-weight: bold;
+    height: 30px;
+    padding: 3px 5px;
+    div {
+      padding: 0;
+    }
+  }
+
+  #factuur_layers .table_layer > div {
+    padding: 0;
+  }
+
+  #fackosten_layers {
+    padding: 0 5px;
+  }
+
+  #fackosten_layers .table_layer > div {
+    padding: 0;
+  }
+
+  #fackosten_layers,
+  #factuur_layers, #kosten_layers, #urenkm_layers {
+    .table_layer {
+      border-bottom: 1px solid #dddddd;
+    }
+
+    .table_col {
+      word-wrap: break-word;
+      padding: 3px 5px;
+    }
+  }
+
+  #factuur_layers > div, #kosten_layers > div, #urenkm_layers > div {
+    display: none;
+  }
+}
+
+#dashboard {
+  display: flex;
+  justify-content: space-between;
+  .modal {
+    .modal-body {
+      float: left;
+      width: 100%;
+    }
+
+    .abbo-box {
+      margin-bottom: 15px;
+    }
+
+    table {
+      border-collapse: collapse;
+      border: 1px solid black;
+      td, th {
+        border: 1px solid black;
+        padding: 5px;
+      }
+      .abbo-header {
+        text-align: center;
+        font-weight: bold;
+        font-size: 1.2em;
+      }
+
+      .user-id {
+        text-align: right;
+      }
+    }
+  }
+
+  .dashboard-div > div {
+    -webkit-box-shadow: 10px 10px 10px -7px rgba(0,0,0,0.6);
+    -moz-box-shadow: 10px 10px 10px -7px rgba(0,0,0,0.6);
+    box-shadow: 10px 10px 10px -7px rgba(0,0,0,0.6);
+    height: 100%;
+  }
+
+  .dashboard-div {
+    margin-bottom: 20px;
+    .dashboard-users, .dashboard-user-count {
+      background-color: white;
+      padding: 15px;
+      min-height: 160px;
+      .dashboard-header {
+        text-align: center;
+        margin-top: 0;
+      }
+      button {
+        float: right;
+      }
+      .user-count-num {
+        text-align: right;
+      }
+      .sub-count-p {
+        margin: 0;
+        width: 100%;
+        padding: 0 15px;
+        text-align: right;
+        display: none;
+      }
+      a:hover {
+        cursor: pointer;
+        text-decoration: none;
+      }
+    }
+  }
+}
+
+#user {
+  .modal {
+    .modal-body {
+      float: left;
+      width: 100%;
+    }
+  }
+
+  .more_left, .more_right {
+    display: none;
+  }
+
+  #urenkm_saved {
+    padding-right: 5px;
+  }
+
+  .save_user {
+    margin-top: 10px;
+  }
+
+  .page_number {
+    font-size: 18px;
+    span {
+      font-weight: bold;
+    }
+  }
+
+  label {
+    margin: 0;
+    padding: 6.8px 0;
+  }
+
+  .field {
+    padding: 0 15px 5px 0;
+    > div {
+      padding: 0 0 0 15px;
+    }
+    &:nth-child(even) {
+      padding: 0 0 5px 0;
+    }
+  }
+  
+  input[type=submit] {
+    float: right;
+  }
+
+  .inputs {
+    display: inline-block;
+  }
+
+  .side-text {
+    font-size: 16px;
+  }
+
+  .tab-content {
+    padding-top: 15px;
+  }
+
+  .page_list {
+    display: table;
+    margin: 0 auto;
+  }
+
+  .empty-alert {
+    font-size: 18px;
+    text-align: center;
+  }
+
+  h3 {
+    margin-top: 0;
+    text-decoration: underline;
+  }
+}
+
+#factuur {
+  .factuur_layer {
+    padding: 0 0 5px 0;
+    label {
+      padding: 6.8px 5px 6.8px 0;
+      text-align: right;
+      margin: 0;
+    }
+    @media screen and (min-width: 0px) and (max-width: 767px) {
+      label {
+        text-align: left;
+      }
+    }
+    > div {
+      padding: 0;
+    }
+    input[type=button] {
+      height: 36px;
+    }
+  }
+
+  .changes-text {
+    color: red;
+    margin: 0;
+    display: none;
+  }
+
+  .modal-body {
+    float: left;
+    width: 100%;
+    .factuur_layer {
+      padding: 0;
+    }
+  }
+
+  .save_factuur {
+    float: right;
+  }
+
+  .fackosten-head {
+    margin-top: 0;
+  }
+
+  .fackosten-add {
+    width: 100%;
+  }
+
+  .fackosten-error {
+    display: none;
+  }
+
+  #add-new-row {
+    display: none;
+    > label, > div {
+      padding: 0;
+      margin-bottom: 5px;
+    }
+
+    button {
+      float: right;
+      margin-bottom: 5px;
+    }
+  }
+}
