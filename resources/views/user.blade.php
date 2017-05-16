@@ -161,6 +161,9 @@
                             <h4 class="modal-title" id="kostenModalTitle">Kosten: <span></span></h4>
                         </div>
                         <div class="modal-body">
+                            <div class="kosten-error alert alert-danger">
+                                <ul></ul>
+                            </div>
                             <p class="loading text-center">Aan het laden...</p>
                             <div class="modal-form form-horizontal">
                                 <input type="hidden" id="kosten_id" value="">
@@ -306,6 +309,9 @@
                             <h4 class="modal-title" id="urenkmModalTitle">Uren & kilometers: <span></span></h4>
                         </div>
                         <div class="modal-body">
+                            <div class="urenkm-error alert alert-danger">
+                                <ul></ul>
+                            </div>
                             <p class="loading text-center">Aan het laden...</p>
                             <div class="modal-form form-horizontal">
                                 <input type="hidden" id="urenkm_id" value="">
@@ -428,32 +434,35 @@
                     data: {'id': row_id},
                     success: function(data) {
                         var row = data[0];
-                        if (page === 'kosten') {
-                            $('#' + page + 'ModalTitle').find('span').text(row.id);
-                            $('#' + page + '_id').val(row.id);
-                            $('#' + page + '_datum').val(row.datum);
-                            $('#' + page + '_omschrijving').val(row.omschrijving);
-                            $('#' + page + '_cat').val(row.cat);
-                            $('#' + page + '_prive').val(row.prive);
-                            $('#' + page + '_btw_bedrag').val(row.btw_bedrag);
-                            $('#' + page + '_btw_tarief').val(row.btw_tarief);
-                            $('#' + page + '_bedrag').val(row.bedrag);
-                            $('#' + page + '_buitenland').val(row.buitenland);
-                            $('.selectpicker').selectpicker('refresh');
-                        } else if (page === 'urenkm') {
-                            $('#' + page + 'ModalTitle').find('span').text(row.id);
-                            $('#' + page + '_id').val(row.id);
-                            $('#' + page + '_datum').val(row.datum);
-                            $('#' + page + '_omschrijving').val(row.omschrijving);
-                            $('#' + page + '_aantaluren').val(row.uren);
-                            if (row.km === null) {
-                                $('#' + page + '_aantalkm').val('0.00');
-                            } else {
-                                $('#' + page + '_aantalkm').val(row.km);
-                            }
-                        } else {
-                            alert('error: check console');
-                            console.log('ERROR: page = ' + page + ' row_id = ' + row_id);
+                        switch(page) {
+                            case 'kosten':
+                                $('#' + page + 'ModalTitle').find('span').text(row.id);
+                                $('#' + page + '_id').val(row.id);
+                                $('#' + page + '_datum').val(row.datum);
+                                $('#' + page + '_omschrijving').val(row.omschrijving);
+                                $('#' + page + '_cat').val(row.cat);
+                                $('#' + page + '_prive').val(row.prive);
+                                $('#' + page + '_btw_bedrag').val(row.btw_bedrag);
+                                $('#' + page + '_btw_tarief').val(row.btw_tarief);
+                                $('#' + page + '_bedrag').val(row.bedrag);
+                                $('#' + page + '_buitenland').val(row.buitenland);
+                                $('.selectpicker').selectpicker('refresh');
+                                break;
+                            case 'urenkm':
+                                $('#' + page + 'ModalTitle').find('span').text(row.id);
+                                $('#' + page + '_id').val(row.id);
+                                $('#' + page + '_datum').val(row.datum);
+                                $('#' + page + '_omschrijving').val(row.omschrijving);
+                                $('#' + page + '_aantaluren').val(row.uren);
+                                if (row.km === null) {
+                                    $('#' + page + '_aantalkm').val('0.00');
+                                } else {
+                                    $('#' + page + '_aantalkm').val(row.km);
+                                }
+                                break;
+                            default:
+                                alert('An error has occured. Check your Console to view the error.');
+                                console.log('Unknown page "' + page + '" or unknown row ID "' + row_id + '"');
                         }
                     },
                     complete: function() {
@@ -466,77 +475,112 @@
         //Updatet rijen uit de database en op de pagina
         function updateRow(page) {
             $('#' + page + 'Edit').find('span').css('display', 'inline-block');
-            if (page === 'kosten') {
-                $.ajax({
-                    url: '/update_kosten',
-                    data: {
-                        'user_id': $('#user_id').val(),
-                        'id': $('#' + page + '_id').val(),
-                        'datum': $('#' + page + '_datum').val(),
-                        'omschrijving': $('#' + page + '_omschrijving').val(),
-                        'cat': $('#' + page + '_cat').val(),
-                        'prive': $('#' + page + '_prive').val(),
-                        'btw_bedrag': $('#' + page + '_btw_bedrag').val(),
-                        'btw_tarief': $('#' + page + '_btw_tarief').val(),
-                        'bedrag': $('#' + page + '_bedrag').val(),
-                        'buitenland': $('#' + page + '_buitenland').val()
-                    },
-                    complete: function () {
-                        $('#' + page + 'Edit').find('span').css('display', 'none');
-                        $('#' + page + 'Saved').css('display', 'inline').fadeOut(2500);
-                        $.getJSON('/fetch_kosten?id=' + $('#' + page + '_id').val(), function (data) {
-                            var layer = $('#' + page + '_' + $('#' + page + '_id').val());
-                            var row = data[0];
-                            layer.find('.datum').html(row.datum);
-                            layer.find('.omschrijving').html(row.omschrijving);
-                            layer.find('.cat').html($('#' + page + '_cat').find(':selected').text());
-                            layer.find('.btw_bedrag').html('&euro; ' + row.btw_bedrag);
-                            layer.find('.prive').html(row.prive + '&#37;');
-                            layer.find('.kwartaal').html('Kwartaal ' + row.kwartaal);
-                        });
-                    }
-                });
-            } else if (page === 'urenkm') {
-                $.ajax({
-                    url: '/update_urenkm',
-                    data: {
-                        'user_id': $('#user_id').val(),
-                        'id': $('#' + page + '_id').val(),
-                        'datum': $('#' + page + '_datum').val(),
-                        'omschrijving': $('#' + page + '_omschrijving').val(),
-                        'aantaluren': $('#' + page + '_aantaluren').val(),
-                        'aantalkm': $('#' + page + '_aantalkm').val()
-                    },
-                    complete: function () {
-                        $('#' + page + 'Edit').find('span').css('display', 'none');
-                        $('#' + page + 'Saved').css('display', 'inline').fadeOut(2500);
-                        $.getJSON('/fetch_kosten?id=' + $('#' + page + '_id').val(), function (data) {
-                            var layer = $('#' + page + '_' + $('#' + page + '_id').val());
-                            var row = data[0];
-                            layer.find('.datum').html(row.datum);
-                            layer.find('.omschrijving').html(row.omschrijving);
-                            layer.find('.uren').html(row.uren + ' uren');
-                            layer.find('.kilometers').html(row.km + ' km');
-                            layer.find('.kwartaal').html('Kwartaal ' + row.kwartaal);
-                        });
-                    }
-                });
-            } else {
-                alert('error: check console');
-                console.log('ERROR: page = ' + page);
+            switch(page) {
+                case 'kosten':
+                    $.ajax({
+                        url: '/update_kosten',
+                        data: {
+                            'user_id': $('#user_id').val(),
+                            'id': $('#' + page + '_id').val(),
+                            'datum': $('#' + page + '_datum').val(),
+                            'omschrijving': $('#' + page + '_omschrijving').val(),
+                            'cat': $('#' + page + '_cat').val(),
+                            'prive': $('#' + page + '_prive').val(),
+                            'btw_bedrag': $('#' + page + '_btw_bedrag').val(),
+                            'btw_tarief': $('#' + page + '_btw_tarief').val(),
+                            'bedrag': $('#' + page + '_bedrag').val(),
+                            'buitenland': $('#' + page + '_buitenland').val()
+                        },
+                        error: function (data) {
+                            var errors = data.responseJSON;
+                            $('.' + page + '-error')
+                                .css('display', 'block').find('ul').empty().end()
+                                .removeClass('alert-success').addClass('alert-danger');
+                            $.each(errors, function(key, value) {
+                                $('.' + page + '-error').find('ul').append('<li>' + value[0] + '</li>');
+                            });
+                        },
+                        success: function () {
+                            $('.' + page + '-error').css('display', 'block')
+                                .find('ul').empty().append('<li>Opgeslagen!</li>')
+                                .end().removeClass('alert-danger')
+                                .addClass('alert-success').fadeOut(2500);
+                        },
+                        complete: function () {
+                            $('#' + page + 'Edit').find('span').css('display', 'none');
+                            $.getJSON('/fetch_kosten?id=' + $('#' + page + '_id').val(), function (data) {
+                                var layer = $('#' + page + '_' + $('#' + page + '_id').val());
+                                var row = data[0];
+                                layer.find('.datum').html(row.datum);
+                                layer.find('.omschrijving').html(row.omschrijving);
+                                layer.find('.cat').html($('#' + page + '_cat').find(':selected').text());
+                                layer.find('.btw_bedrag').html('&euro; ' + row.btw_bedrag);
+                                layer.find('.prive').html(row.prive + '&#37;');
+                                layer.find('.kwartaal').html('Kwartaal ' + row.kwartaal);
+                            });
+                        }
+                    });
+                    break;
+                case 'urenkm':
+                    $.ajax({
+                        url: '/update_urenkm',
+                        data: {
+                            'user_id': $('#user_id').val(),
+                            'id': $('#' + page + '_id').val(),
+                            'datum': $('#' + page + '_datum').val(),
+                            'omschrijving': $('#' + page + '_omschrijving').val(),
+                            'aantaluren': $('#' + page + '_aantaluren').val(),
+                            'aantalkm': $('#' + page + '_aantalkm').val()
+                        },
+                        error: function (data) {
+                            var errors = data.responseJSON;
+                            $('.' + page + '-error')
+                                .css('display', 'block').find('ul').empty().end()
+                                .removeClass('alert-success').addClass('alert-danger');
+                            $.each(errors, function(key, value) {
+                                $('.' + page + '-error').find('ul').append('<li>' + value[0] + '</li>');
+                            });
+                        },
+                        success: function () {
+                            $('.' + page + '-error').css('display', 'block')
+                                .find('ul').empty().append('<li>Opgeslagen!</li>')
+                                .end().removeClass('alert-danger')
+                                .addClass('alert-success').fadeOut(2500);
+                        },
+                        complete: function () {
+                            $('#' + page + 'Edit').find('span').css('display', 'none');
+                            $.getJSON('/fetch_' + page + '?id=' + $('#' + page + '_id').val(), function (data) {
+                                var layer = $('#' + page + '_' + $('#' + page + '_id').val());
+                                var row = data[0];
+                                layer.find('.datum').html(row.datum);
+                                layer.find('.omschrijving').html(row.omschrijving);
+                                layer.find('.uren').html(row.uren + ' uren');
+                                layer.find('.kilometers').html(row.km + ' km');
+                                layer.find('.kwartaal').html('Kwartaal ' + row.kwartaal);
+                            });
+                        }
+                    });
+                    break;
+                default:
+                    alert('An error has occured. Check your Console to view the error.');
+                    console.log('Unknown page: ' + page);
             }
         }
 
         //Verwijderd rijen uit de database en op de pagina
         function removeRow(row_id, page) {
             if (confirm("Weet je zeker dat je rij " + row_id + " wilt verwijderen?")) {
-                $('#loading_screen').css('display', 'block');
+                $('#loading_screen').show();
                 $.ajax({
-                    url: '/remove_' + page,
-                    data: {'id': row_id},
+                    url: '/remove_row',
+                    data: {
+                        'page': page,
+                        'id': row_id,
+                        'user_id': $('#user_id').val()
+                    },
                     complete: function () {
                         $('#' + page + '_' + row_id).remove();
-                        $('#loading_screen').css('display', 'none');
+                        $('#loading_screen').hide();
                     }
                 });
             }
