@@ -7922,6 +7922,14 @@ button.close {
   text-decoration: underline;
 }
 
+#user .kosten-error {
+  display: none;
+}
+
+#user .urenkm-error {
+  display: none;
+}
+
 #factuur .factuur_layer {
   padding: 0 0 5px 0;
 }

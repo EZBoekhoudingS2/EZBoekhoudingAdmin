@@ -550,6 +550,7 @@
             $('.selectpicker').selectpicker('refresh');
             $('#add-new-row').toggle();
             $('.fackosten-add').toggle();
+            $('.fackosten-error').css('display', 'none');
         }
 
         // Deze functie voegt een kostenpost toe in de database
@@ -577,9 +578,6 @@
 
                 },
                 success: function() {
-                    // VOLGENDE KEER HIER VERDER GAAN
-                    // NIEUWE RIJ METEEN TOEVOEGEN AAN DE TABEL
-
                     $('#add-new-row').find('input').val('').end()
                         .find('.selectpicker').selectpicker('val', '');
                     $('#add-new-row').toggle();
@@ -588,7 +586,6 @@
                         .find('ul').empty().append('<li>Opgeslagen!</li>')
                         .end().removeClass('alert-danger')
                         .addClass('alert-success').fadeOut(2500);
-
                     showRow();
                 },
                 complete: function() {
