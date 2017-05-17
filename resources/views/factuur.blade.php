@@ -166,14 +166,14 @@
                                 Ga met je muis over de ID om de omschrijving te zien van de kostenpost.
                             </p>
                             <div class="modal-form form-horizontal">
-                                <input type="hidden" value="{{ count($fac_kosten) }}" class="fackosten-count">
-                                @foreach ($fac_kosten as $fac_kost)
+                                <input type="hidden" value="{{ count($fackosten) }}" class="fackosten-count">
+                                @foreach ($fackosten as $fackost)
                                     <div class="form-group">
-                                        <input type="hidden" value="{{ $fac_kost->type }}" class="fackosten-type">
-                                        <input type="hidden" value="{{ $fac_kost->kosten_id }}" class="fackosten-id">
-                                        <label for="kostenid_{{ $fac_kost->kosten_id }}" class="control-label col-lg-2" title="{{ $fac_kost->omschrijving }}">{{ $fac_kost->kosten_id }}:</label>
+                                        <input type="hidden" value="{{ $fackost->type }}" class="fackosten-type">
+                                        <input type="hidden" value="{{ $fackost->kosten_id }}" class="fackosten-id">
+                                        <label for="kostenid_{{ $fackost->kosten_id }}" class="control-label col-lg-2" title="{{ $fackost->omschrijving }}">{{ $fackost->kosten_id }}:</label>
                                         <div class="col-lg-10">
-                                            <select id="kostenid_{{ $fac_kost->kosten_id }}" class="form-control selectpicker changeType" title="Kies voor:">
+                                            <select id="kostenid_{{ $fackost->kosten_id }}" class="form-control selectpicker changeType" title="Kies voor:">
                                                 <option value="1">Product</option>
                                                 <option value="2">Dienst</option>
                                             </select>
@@ -188,14 +188,14 @@
                                 Ga met je muis over de ID om de omschrijving te zien van de kostenpost.
                             </p>
                             <div class="modal-form form-horizontal">
-                                <input type="hidden" value="{{ count($fac_kosten) }}" class="fackosten-count">
-                                @foreach ($fac_kosten as $fac_kost)
+                                <input type="hidden" value="{{ count($fackosten) }}" class="fackosten-count">
+                                @foreach ($fackosten as $fackost)
                                     <div class="form-group">
-                                        <input type="hidden" value="{{ $fac_kost->type }}" class="fackosten-type">
-                                        <input type="hidden" value="{{ $fac_kost->kosten_id }}" class="fackosten-id">
-                                        <label for="kostenid_{{ $fac_kost->kosten_id }}" class="control-label col-lg-2" title="{{ $fac_kost->omschrijving }}">{{ $fac_kost->kosten_id }}:</label>
+                                        <input type="hidden" value="{{ $fackost->type }}" class="fackosten-type">
+                                        <input type="hidden" value="{{ $fackost->kosten_id }}" class="fackosten-id">
+                                        <label for="kostenid_{{ $fackost->kosten_id }}" class="control-label col-lg-2" title="{{ $fackost->omschrijving }}">{{ $fackost->kosten_id }}:</label>
                                         <div class="col-lg-10">
-                                            <select id="kostenid_{{ $fac_kost->kosten_id }}" class="form-control selectpicker changeType">
+                                            <select id="kostenid_{{ $fackost->kosten_id }}" class="form-control selectpicker changeType">
                                                 <option value="0">Geen type</option>
                                             </select>
                                         </div>
@@ -623,10 +623,11 @@
             if (confirm('Weet je zeker dat je rij ' + row_id + ' wilt verwijderen?') === true) {
                 $('#loading_screen').css('display', 'block');
                 $.ajax({
-                    url: '/remove_fackosten',
+                    url: '/remove_row',
                     data: {
-                        'kosten_id': row_id,
-                        'klant_id': $('#klant_id').val()
+                        'page': 'fackosten',
+                        'id': row_id,
+                        'user_id': $('#klant_id').val()
                     },
                     complete: function() {
                         showRow();

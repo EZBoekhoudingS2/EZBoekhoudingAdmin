@@ -86,8 +86,6 @@
 }
 
 #dashboard {
-  display: flex;
-  justify-content: space-between;
   .modal {
     .modal-body {
       float: left;
@@ -117,23 +115,22 @@
     }
   }
 
-  .dashboard-div > div {
-    -webkit-box-shadow: 10px 10px 10px -7px rgba(0,0,0,0.6);
-    -moz-box-shadow: 10px 10px 10px -7px rgba(0,0,0,0.6);
-    box-shadow: 10px 10px 10px -7px rgba(0,0,0,0.6);
-    height: 100%;
-  }
-
   .dashboard-div {
     margin-bottom: 20px;
-    .dashboard-users, .dashboard-user-count {
-      background-color: white;
+    > div {
+      height: 100%;
       padding: 15px;
       min-height: 160px;
-      .dashboard-header {
-        text-align: center;
-        margin-top: 0;
-      }
+      background-color: white;
+      box-shadow: 10px 10px 10px -7px rgba(0,0,0,0.6);
+      -moz-box-shadow: 10px 10px 10px -7px rgba(0,0,0,0.6);
+      -webkit-box-shadow: 10px 10px 10px -7px rgba(0,0,0,0.6);
+    }
+    .dashboard-header {
+      text-align: center;
+      margin-top: 0;
+    }
+    .dashboard-users, .dashboard-user-count {
       button {
         float: right;
       }

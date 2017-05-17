@@ -38,7 +38,7 @@
                 </div>
             </div>
         </div>
-        <div class="dashboard-div col-xs-12 col-sm-6 col-md-4">
+        <div class="dashboard-div col-xs-12 col-sm-6">
             <div class="dashboard-user-count">
                 <h3 class="dashboard-header">Gebruikersaantallen</h3>
                 @foreach($user_count as $key => $value)
@@ -49,7 +49,7 @@
                 @endforeach
             </div>
         </div>
-        <div class="dashboard-div col-xs-12 col-sm-6 col-md-4">
+        <div class="dashboard-div col-xs-12 col-sm-6">
             <div class="dashboard-users">
                 <h3 class="dashboard-header">Alle gebruikers</h3>
                 <div class="form-group">
@@ -64,7 +64,7 @@
                 </a>
             </div>
         </div>
-        <div class="dashboard-div col-xs-12 col-sm-6 col-md-4">
+        <div class="dashboard-div col-xs-12 col-sm-6">
             <div class="dashboard-user-count">
                 <h3 class="dashboard-header">Gebruikerssoorten</h3>
                 @foreach ($subs as $subs_type)
@@ -79,6 +79,12 @@
                         </div>
                     @endforeach
                 @endforeach
+            </div>
+        </div>
+        <div class="dashboard-div col-xs-12 col-sm-6">
+            <div class="dashboard-user-chart">
+                <h3 class="dashboard-header">Gebruikersgrafiek</h3>
+                <canvas id="userChart" width="250" height="200"></canvas>
             </div>
         </div>
     </div>
@@ -102,6 +108,42 @@
                 content: "Actief: " + $(this).parent().find('.active-count').val() + " Non-actief: " + $(this).parent().find('.non-active-count').val(),
                 html: true
             });
+        });
+
+        var sub_labels = [];
+        var sub_values = [];
+        @foreach ($subs as $subs_type)
+            @foreach ($subs_type as $sub)
+                sub_labels.push('{{ $sub['title'] }}');
+                sub_values.push('{{ $sub[0] }}');
+            @endforeach
+        @endforeach
+
+        const chart = $('#userChart');
+        var userChart = new Chart(chart, {
+            type: 'pie',
+            data: {
+                labels: sub_labels,
+                datasets: [{
+                    backgroundColor: [
+                        '#00008b',
+                        '#f1c40f',
+                        '#e67e22',
+                        '#16a085',
+                        '#2980b9',
+                        '#ff2828',
+                        '#ff1493',
+                        '#a0522d'
+                    ],
+                    data: sub_values
+                }]
+            },
+            options: {
+                cutoutPercentage: 60,
+                animation: {
+                    animateScale: true
+                }
+            }
         });
     </script>
 @endsection

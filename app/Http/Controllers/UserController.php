@@ -8,7 +8,7 @@ use DB;
 class UserController extends Controller
 {
 
-    public $komma_getallen = '/^\d{1,}(,?\d{1,2})?$/'; // Regex accepteert komma getallen
+    public $komma_getallen_regex = '/^\d{1,}(,?\d{1,2})?$/'; // Regex accepteert komma getallen
 
     // Weergeeft de algemene pagina
     public function index($user_id) {
@@ -206,10 +206,10 @@ class UserController extends Controller
     // Update de algemene pagina
     public function update(Request $request) {
         $this->validate($request, [
-            'email' => 'required|email',
-            'straat' => 'regex:/^([\p{L}a-zA-Z.? ]{3,30}\s[0-9]{1,5}([a-zA-Z]{1,3})?)?$/',
-            'postcode' => 'regex:/^([1-9][0-9]{3} ?[a-zA-Z]{2})?$/',
-            'telefoon' => 'regex:/^([\d\+\(\)\s]{10,15})?$/'
+            'email'     => 'required|email',
+            'straat'    => 'regex:/^([\p{L}a-zA-Z.? ]{3,30}\s[0-9]{1,5}([a-zA-Z]{1,3})?)?$/',
+            'postcode'  => 'regex:/^([1-9][0-9]{3} ?[a-zA-Z]{2})?$/',
+            'telefoon'  => 'regex:/^([\d\+\(\)\s]{10,15})?$/'
         ]);
 
         $trial              = $_POST['trial'];
@@ -227,28 +227,25 @@ class UserController extends Controller
             DB::connection('mysql2')
                 ->table('incasso')
                 ->where(['user_id' => $user_id])
-                ->update([
-                    'active' => $active,
-                    'maandjaar' => explode('_', $sub)[2]
-                ]);
+                ->update(['active' => $active, 'maandjaar' => explode('_', $sub)[2]]);
         } else {
             DB::connection('mysql2')
                 ->table('incasso')
                 ->insert([
-                    'user_id' => $user_id,
-                    'active' => 1,
+                    'user_id'   => $user_id,
+                    'active'    => 1,
                     'maandjaar' => explode('_', $sub)[2],
-                    'date' => date('d-m-Y'),
-                    'time' => time()
+                    'date'      => date('d-m-Y'),
+                    'time'      => time()
                 ]);
         }
 
         DB::connection('mysql2')
             ->table('users')
-            ->where('id', $user_id)
+            ->where(['id' => $user_id])
             ->update([
-                'type' => explode('_', $sub)[0],
-                'user' => explode('_', $sub)[1],
+                'type'  => explode('_', $sub)[0],
+                'user'  => explode('_', $sub)[1],
                 'trial' => $trial
             ]);
 
@@ -265,94 +262,106 @@ class UserController extends Controller
 
     // Weergeeft subpagina Factuuroverzicht
     public function fetchFacturen($klant_id, $factuur_id) {
-        $current_user   = DB::connection('mysql2')->table('users')->where(['id' => $klant_id])->get();
-        $landen         = DB::connection('mysql2')->table('landen')->orderBy('land', 'asc')->get();
-        $facturen       = DB::connection('mysql2')->table('facturen')
+        $current_user = DB::connection('mysql2')->table('users')->where(['id' => $klant_id])->get();
+        $landen = DB::connection('mysql2')->table('landen')->orderBy('land', 'asc')->get();
+        $facturen = DB::connection('mysql2')->table('facturen')
             ->select(
                 'factuur_id', 'klant_id', 'factuur_nr', 'klant', 'adres', 'tav', 'email', 'voldaan',
                 'datum', 'type', 'verlegd_btw', 'land_code', 'land_particulier',
                 'verstuurd', 'verst_0', 'verst_1', 'verst_2', 'img', 'termijn'
             )
             ->where([
-                'factuur_id' => $factuur_id,
-                'klant_id' => $klant_id
-            ])
-            ->get();
+                'factuur_id'    => $factuur_id,
+                'klant_id'      => $klant_id
+            ])->get();
 
-        $fac_kosten     = DB::connection('mysql2')->table('fac_kosten')
+        $fackosten = DB::connection('mysql2')->table('fac_kosten')
             ->select(
-                'kosten_id', 'factuur_id', 'klant_id', 'bedrag', 'btw_bedrag', 'btw_tarief', 'btw',
-                'omschrijving', 'kwartaal', 'jaar', 'type'
+                'kosten_id', 'factuur_id', 'klant_id', 'bedrag', 'btw_bedrag',
+                'btw_tarief', 'btw', 'omschrijving', 'kwartaal', 'jaar', 'type'
             )
             ->where([
-                'factuur_id' => $factuur_id,
-                'klant_id' => $klant_id
-            ])
-            ->get();
-
-        for ($i = 0; $i < count($fac_kosten); $i++) {
-            $fac_kosten[$i]->bedrag = $this->punt_naar_komma($fac_kosten[$i]->bedrag);
-        }
-
-        $fac_klant          = explode('^', $facturen[0]->klant);
-        $fac_adres          = explode('^', $facturen[0]->adres);
-        $fac_kosten_modal   = array(
-            $fac_kosten[0]->omschrijving,
-            $fac_kosten[0]->bedrag,
-            $fac_kosten[0]->btw_bedrag,
-            $fac_kosten[0]->btw_tarief
-        );
+                'factuur_id'    => $factuur_id,
+                'klant_id'      => $klant_id
+            ])->get();
 
         $land = array();
         $labels = array(
-            'factuur_id' => 'Factuur id',
-            'factuur_nr' => 'Factuurnummer',
-            'klant' => 'Klantgegevens',
-            'klant_id' => 'Klant id',
-            'adres' => 'Adresgegevens',
-            'tav' => 'T.a.v.',
-            'email' => 'Email',
-            'voldaan' => 'Voldaan',
-            'datum' => 'Datum',
-            'type' => 'Type',
-            'verlegd_btw' => 'Verlegd btw',
-            'land_code' => 'Land',
-            'land_particulier' => 'Land particulier',
-            'verstuurd' => 'Verstuurd',
-            'verst_0' => 'Verstuurd 0',
-            'verst_1' => 'Verstuurd 1',
-            'verst_2' => 'Verstuurd 2',
-            'img' => 'Foto',
-            'termijn' => 'Termijn'
+            'factuur_id'        => 'Factuur id',
+            'factuur_nr'        => 'Factuurnummer',
+            'klant'             => 'Klantgegevens',
+            'klant_id'          => 'Klant id',
+            'adres'             => 'Adresgegevens',
+            'tav'               => 'T.a.v.',
+            'email'             => 'Email',
+            'voldaan'           => 'Voldaan',
+            'datum'             => 'Datum',
+            'type'              => 'Type',
+            'verlegd_btw'       => 'Verlegd btw',
+            'land_code'         => 'Land',
+            'land_particulier'  => 'Land particulier',
+            'verstuurd'         => 'Verstuurd',
+            'verst_0'           => 'Verstuurd 0',
+            'verst_1'           => 'Verstuurd 1',
+            'verst_2'           => 'Verstuurd 2',
+            'img'               => 'Foto',
+            'termijn'           => 'Termijn'
         );
         $klant_labels = array(
-            'email' => ['Email'],
-            'vnaam' => ['Voornaam'],
-            'anaam' => ['Achternaam'],
-            'adres' => ['Adres'],
-            'postcode' => ['Postcode'],
-            'plaats' => ['Plaats'],
-            'bedrijfsnaam' => ['Bedrijfsnaam'],
-            'iban' => ['IBAN'],
-            'btw_nr' => ['Btw-nummer'],
-            'kvk' => ['KvK-nummer'],
-            'logo' => ['Logo'],
-            'ibannaam' => ['IBAN naam'],
-        );
-        $adres_labels = array(
-            'bedrijfsnaam' => ['Bedrijfsnaam'],
-            'adres' => ['Adres'],
-            'postcode' => ['Postcode'],
-            'plaats' => ['Plaats'],
-            'land' => ['Land'],
-        );
-        $fackosten_labels = array(
-            'omschrijving' => ['Omschrijving'],
-            'bedrag' => ['Bedrag excl.'],
-            'btw_bedrag' => ['Bedrag incl.'],
-            'btw_tarief' => ['Btw-tarief'],
+            'email'             => ['Email'],
+            'vnaam'             => ['Voornaam'],
+            'anaam'             => ['Achternaam'],
+            'adres'             => ['Adres'],
+            'postcode'          => ['Postcode'],
+            'plaats'            => ['Plaats'],
+            'bedrijfsnaam'      => ['Bedrijfsnaam'],
+            'iban'              => ['IBAN'],
+            'btw_nr'            => ['Btw-nummer'],
+            'kvk'               => ['KvK-nummer'],
+            'logo'              => ['Logo'],
+            'ibannaam'          => ['IBAN naam'],
         );
 
+        $adres_labels = array(
+            'bedrijfsnaam'      => ['Bedrijfsnaam'],
+            'adres'             => ['Adres'],
+            'postcode'          => ['Postcode'],
+            'plaats'            => ['Plaats'],
+            'land'              => ['Land'],
+        );
+
+        foreach ($fackosten as $fackost) {
+            $fackost->bedrag = $this->punt_naar_komma($fackost->bedrag);
+        }
+
+        // Als Klant leeg is, zet de delimiters (^) er wel in
+        if (empty($facturen[0]->klant)) {
+            DB::connection('mysql2')->table('facturen')
+                ->where(['factuur_id' => $factuur_id, 'klant_id' => $klant_id])
+                ->update(['klant' => '^^^^^^^^^^^']);
+        }
+
+        // Als Adres leeg is, zet de delimiters (^) er wel in
+        if (empty($facturen[0]->adres)) {
+            DB::connection('mysql2')->table('facturen')
+                ->where(['factuur_id' => $factuur_id, 'klant_id' => $klant_id])
+                ->update(['adres' => '^^^^']);
+        }
+
+        $facklant = explode('^', $facturen[0]->klant);
+        $facadres = explode('^', $facturen[0]->adres);
+
+        // OUTPUT EXAMPLE: $klant_labels['email'] = ['email', 'test@test.com'];
+        for ($i = 0; $i < count($klant_labels); $i++) {
+            array_push($klant_labels[array_keys($klant_labels)[$i]], $facklant[$i]);
+        }
+
+        // OUTPUT EXAMPLE: $klant_labels['bedrijfsnaam'] = ['bedrijfsnaam', 'Trump Organization'];
+        for ($i = 0; $i < count($adres_labels); $i++) {
+            array_push($adres_labels[array_keys($adres_labels)[$i]], $facadres[$i]);
+        }
+
+        // OUTPUT EXAMPLE: $land[NL_0] = Nederland (NL);
         for ($j = 0; $j < count($landen); $j++) {
             $land[$landen[$j]->land_code . '_' . $landen[$j]->eu] = $landen[$j]->land . ' (' . $landen[$j]->land_code . ')';
         }
@@ -382,48 +391,39 @@ class UserController extends Controller
             ),
         );
 
-        for ($i = 0; $i < count($klant_labels); $i++) {
-            array_push($klant_labels[array_keys($klant_labels)[$i]], $fac_klant[$i]);
-        }
-        for ($i = 0; $i < count($adres_labels); $i++) {
-            array_push($adres_labels[array_keys($adres_labels)[$i]], $fac_adres[$i]);
-        }
-        for ($i = 0; $i < count($fackosten_labels); $i++) {
-            array_push($fackosten_labels[array_keys($fackosten_labels)[$i]], $fac_kosten_modal[$i]);
-        }
-        return view('factuur', compact('current_user', 'factuur_id', 'klant_id', 'facturen', 'fac_kosten', 'fac_klant', 'klant_labels', 'fac_adres', 'adres_labels', 'fackosten_labels', 'landen', 'disabled', 'buttons', 'dropdowns', 'labels'));
+        return view('factuur', compact('current_user', 'factuur_id', 'klant_id', 'facturen', 'fackosten', 'facklant', 'facadres', 'klant_labels', 'adres_labels', 'landen', 'disabled', 'buttons', 'dropdowns', 'labels'));
     }
 
     // Update subpagina Factuuroverzicht
     public function updateFacturen(Request $request) {
         $this->validate($request, [
-            'klant_email' => 'required|email',
-            'klant_vnaam' => 'required',
-            'klant_anaam' => 'required',
-            'klant_adres' => 'required',
-            'klant_postcode' => 'required|regex:/^[0-9]{4} ?[a-zA-Z]{2}$/',
-            'klant_plaats' => 'required',
-            'klant_bedrijfsnaam' => 'required',
-            'klant_iban' => 'required',
-            'klant_btw_nr' => 'required',
-            'klant_kvk' => 'required',
-            'klant_ibannaam' => 'required',
+            'klant_email'           => 'required|email',
+            'klant_vnaam'           => 'required',
+            'klant_anaam'           => 'required',
+            'klant_adres'           => 'required',
+            'klant_postcode'        => 'required|regex:/^[0-9]{4} ?[a-zA-Z]{2}$/',
+            'klant_plaats'          => 'required',
+            'klant_bedrijfsnaam'    => 'required',
+            'klant_iban'            => 'required',
+            'klant_btw_nr'          => 'required',
+            'klant_kvk'             => 'required',
+            'klant_ibannaam'        => 'required',
 
-            'adres_bedrijfsnaam' => 'required',
-            'adres_adres' => 'required',
-            'adres_postcode' => 'required|regex:/^[0-9]{4} ?[a-zA-Z]{2}$/',
-            'adres_plaats' => 'required',
-            'adres_land' => 'required',
+            'adres_bedrijfsnaam'    => 'required',
+            'adres_adres'           => 'required',
+            'adres_postcode'        => 'required|regex:/^[0-9]{4} ?[a-zA-Z]{2}$/',
+            'adres_plaats'          => 'required',
+            'adres_land'            => 'required',
 
-            'tav' => 'required',
-            'email' => 'required|email',
-            'voldaan' => 'required|numeric',
-            'datum' => 'required|date_format:d-m-Y',
-            'type' => 'required|numeric',
-            'verlegd_btw' => 'required',
-            'land_code' => 'required|regex:/^[A-Z]{2}\_[0-9]{1}$/',
-            'verstuurd' => 'required|numeric',
-            'termijn' => 'required|numeric',
+            'tav'                   => 'required',
+            'email'                 => 'required|email',
+            'voldaan'               => 'required|numeric',
+            'datum'                 => 'required|date_format:d-m-Y',
+            'type'                  => 'required|numeric',
+            'verlegd_btw'           => 'required',
+            'land_code'             => 'required|regex:/^[A-Z]{2}\_[0-9]{1}$/',
+            'verstuurd'             => 'required|numeric',
+            'termijn'               => 'required|numeric',
         ]);
 
         $klant = implode('^', [
@@ -452,44 +452,38 @@ class UserController extends Controller
 
         DB::connection('mysql2')->table('facturen')
             ->where([
-                'factuur_id' => $_POST['factuur_id'],
-                'klant_id' => $_POST['klant_id']
+                'factuur_id'        => $_POST['factuur_id'],
+                'klant_id'          => $_POST['klant_id']
             ])
             ->update([
-                'klant' => $klant,
-                'adres' => $adres,
-                'tav' => $_POST['tav'],
-                'email' => $_POST['email'],
-                'voldaan' => $_POST['voldaan'],
-                'datum' => $_POST['datum'],
-                'dag' => $this->getdag($_POST['datum']),
-                'maand' => $this->getmaand($_POST['datum']),
-                'jaar' => $this->getjaar($_POST['datum']),
-                'kwartaal' => $this->kwartaal($_POST['datum']),
-                'type' => $_POST['type'],
-                'verlegd' => explode('_', $_POST['land_code'])[1],
-                'verlegd_btw' => $_POST['verlegd_btw'],
-                'land_code' => explode('_', $_POST['land_code'])[0],
-                'land_particulier' => $_POST['land_particulier'],
-                'verstuurd' => $_POST['verstuurd'],
-                'verst_0' => $_POST['verst_0'],
-                'verst_1' => $_POST['verst_1'],
-                'verst_2' => $_POST['verst_2'],
-                'img' => $_POST['img'],
-                'termijn' => $_POST['termijn']
+                'klant'             => $klant,
+                'adres'             => $adres,
+                'tav'               => $_POST['tav'],
+                'email'             => $_POST['email'],
+                'voldaan'           => $_POST['voldaan'],
+                'datum'             => $_POST['datum'],
+                'dag'               => $this->getdag($_POST['datum']),
+                'maand'             => $this->getmaand($_POST['datum']),
+                'jaar'              => $this->getjaar($_POST['datum']),
+                'kwartaal'          => $this->kwartaal($_POST['datum']),
+                'type'              => $_POST['type'],
+                'verlegd'           => explode('_', $_POST['land_code'])[1],
+                'verlegd_btw'       => $_POST['verlegd_btw'],
+                'land_code'         => explode('_', $_POST['land_code'])[0],
+                'land_particulier'  => $_POST['land_particulier'],
+                'verstuurd'         => $_POST['verstuurd'],
+                'verst_0'           => $_POST['verst_0'],
+                'verst_1'           => $_POST['verst_1'],
+                'verst_2'           => $_POST['verst_2'],
+                'img'               => $_POST['img'],
+                'termijn'           => $_POST['termijn']
             ]);
 
         $fackosten_count = DB::connection('mysql2')->table('fac_kosten')->where(['factuur_id' => $_POST['factuur_id'], 'klant_id' => $_POST['klant_id']])->count();
         for ($i = 0; $i < $fackosten_count; $i++) {
             DB::connection('mysql2')->table('fac_kosten')
-                ->where([
-                    'factuur_id' => $_POST['factuur_id'],
-                    'klant_id' => $_POST['klant_id']
-                ])
-                ->update([
-                    'jaar' => $this->getjaar($_POST['datum']),
-                    'kwartaal' => $this->kwartaal($_POST['datum'])
-                ]);
+                ->where(['factuur_id' => $_POST['factuur_id'], 'klant_id' => $_POST['klant_id']])
+                ->update(['jaar' => $this->getjaar($_POST['datum']), 'kwartaal' => $this->kwartaal($_POST['datum'])]);
         }
 
         $success =
@@ -503,26 +497,12 @@ class UserController extends Controller
 
     // Weergeeft kostenposten
     public function fetchFackosten() {
-        if (isset($_GET['kosten_id'])) {
-            $fac_kosten = DB::connection('mysql2')->table('fac_kosten')
-                ->where([
-                    'kosten_id' => $_GET['kosten_id'],
-                    'klant_id' => $_GET['klant_id']
-                ])
-                ->get();
-            foreach ($fac_kosten as $fac_kost) {
-                $fac_kost->bedrag = $this->punt_naar_komma($fac_kost->bedrag);
-                $fac_kost->btw_bedrag = $this->punt_naar_komma($fac_kost->btw_bedrag);
-            }
-            return $fac_kosten;
-        }
+        $fac_kosten = (isset($_GET['kosten_id']))
+            ? DB::connection('mysql2')->table('fac_kosten')
+                ->where(['kosten_id' => $_GET['kosten_id'], 'klant_id' => $_GET['klant_id']])->get()
+            : DB::connection('mysql2')->table('fac_kosten')
+                ->where(['factuur_id' => $_GET['factuur_id'], 'klant_id' => $_GET['klant_id']])->get();
 
-        $fac_kosten = DB::connection('mysql2')->table('fac_kosten')
-            ->where([
-                'factuur_id' => $_GET['factuur_id'],
-                'klant_id' => $_GET['klant_id']
-            ])
-            ->get();
         foreach ($fac_kosten as $fac_kost) {
             $fac_kost->bedrag = $this->punt_naar_komma($fac_kost->bedrag);
             $fac_kost->btw_bedrag = $this->punt_naar_komma($fac_kost->btw_bedrag);
@@ -533,69 +513,59 @@ class UserController extends Controller
     // Voegt een kostenpost toe
     public function addFackosten(Request $request) {
         $this->validate($request, [
-            'omschrijving' => 'required',
-            'bedrag' => 'required',
-            'btw_tarief' => 'required',
-            'type' => 'required|numeric',
+            'omschrijving'  => 'required',
+            'bedrag'        => 'required',
+            'btw_tarief'    => 'required',
+            'type'          => 'required|numeric',
         ]);
 
         $btw_bedrag = ($_GET['btw_tarief'] === 'vrij') ? $_GET['bedrag'] : number_format($_GET['bedrag'] / 100 * (100 + $_GET['btw_tarief']), 2, '.', '');
-        $facturen = DB::connection('mysql2')
-            ->table('facturen')->select('kwartaal', 'jaar')
-            ->where(['factuur_id' => $_GET['factuur_id']])
-            ->get();
+
+        $facturen = DB::connection('mysql2')->table('facturen')
+            ->select('kwartaal', 'jaar')->where(['factuur_id' => $_GET['factuur_id']])->get();
 
         DB::connection('mysql2')->table('fac_kosten')
             ->insert([
-                'factuur_id' => $_GET['factuur_id'],
-                'klant_id' => $_GET['klant_id'],
-                'bedrag' => $_GET['bedrag'],
-                'btw_bedrag' => $btw_bedrag,
-                'btw_tarief' => $_GET['btw_tarief'],
-                'btw' => number_format($btw_bedrag - $_GET['bedrag'], 2, '.', ''),
-                'omschrijving' => $_GET['omschrijving'],
-                'kwartaal' => $facturen[0]->kwartaal,
-                'jaar' => $facturen[0]->jaar,
-                'type' => $_GET['type']
+                'factuur_id'    => $_GET['factuur_id'],
+                'klant_id'      => $_GET['klant_id'],
+                'bedrag'        => $_GET['bedrag'],
+                'btw_bedrag'    => $btw_bedrag,
+                'btw_tarief'    => $_GET['btw_tarief'],
+                'btw'           => number_format($btw_bedrag - $_GET['bedrag'], 2, '.', ''),
+                'omschrijving'  => $_GET['omschrijving'],
+                'kwartaal'      => $facturen[0]->kwartaal,
+                'jaar'          => $facturen[0]->jaar,
+                'type'          => $_GET['type']
             ]);
     }
 
     // Update kostenposten
     public function updateFackosten() {
         if (isset($_GET['request']) && $_GET['request'] === 'type') {
+            // Update types van alle kostenposten
             for ($i = 0; $i < $_GET['count']; $i++) {
                 DB::connection('mysql2')->table('fac_kosten')
-                    ->where([
-                        'kosten_id' => $_GET['kosten_id'][$i],
-                        'klant_id' => $_GET['klant_id']
-                    ])
-                    ->update([
-                        'type' => $_GET['type'][$i]
-                    ]);
+                    ->where(['kosten_id' => $_GET['kosten_id'][$i], 'klant_id' => $_GET['klant_id']])
+                    ->update(['type' => $_GET['type'][$i]]);
             }
         } else {
+            // Update alles van een kostenpost
             DB::connection('mysql2')->table('fac_kosten')
                 ->where(['kosten_id' => $_GET['kosten_id'], 'klant_id' => $_GET['klant_id']])
                 ->update([
-                    'bedrag' => $this->komma_naar_punt($_GET['bedrag']),
-                    'btw_bedrag' => $this->komma_naar_punt($_GET['btw_bedrag']),
-                    'btw_tarief' => $_GET['btw_tarief'],
-                    'btw' => $this->komma_naar_punt($this->komma_naar_punt($_GET['btw_bedrag']) - $this->komma_naar_punt($_GET['bedrag'])),
-                    'omschrijving' => $_GET['omschrijving'],
-                    'type' => $_GET['type']
+                    'bedrag'        => $this->komma_naar_punt($_GET['bedrag']),
+                    'btw_bedrag'    => $this->komma_naar_punt($_GET['btw_bedrag']),
+                    'btw_tarief'    => $_GET['btw_tarief'],
+                    'btw'           => $this->komma_naar_punt($this->komma_naar_punt($_GET['btw_bedrag']) - $this->komma_naar_punt($_GET['bedrag'])),
+                    'omschrijving'  => $_GET['omschrijving'],
+                    'type'          => $_GET['type']
                 ]);
         }
     }
 
-    public function removeFackosten() {
-        DB::connection('mysql2')->table('fac_kosten')->where(['kosten_id' => $_GET['kosten_id'], 'klant_id' => $_GET['klant_id']])->delete();
-    }
-
     // Weergeeft subpagina kostenoverzicht
     public function fetchKosten() {
-        $kosten = DB::connection('mysql2')->table('kosten')
-            ->where(['id' => $_GET['id']])
-            ->get();
+        $kosten = DB::connection('mysql2')->table('kosten')->where(['id' => $_GET['id']])->get();
         $kosten[0]->btw_bedrag = $this->punt_naar_komma($kosten[0]->btw_bedrag);
         $kosten[0]->bedrag = $this->punt_naar_komma($kosten[0]->bedrag);
         return $kosten;
@@ -604,46 +574,41 @@ class UserController extends Controller
     // Update subpagina kostenoverzicht
     public function updateKosten(Request $request) {
         $this->validate($request, [
-            'datum' => 'required|date_format:d-m-Y',
-            'omschrijving' => 'required',
-            'cat' => 'required|numeric',
-            'prive' => 'required|numeric',
-            'btw_bedrag' => 'required|regex:' . $this->komma_getallen,
-            'btw_tarief' => 'required',
-            'bedrag' => 'required|regex:' . $this->komma_getallen,
-            'buitenland' => 'required|numeric',
+            'datum'         => 'required|date_format:d-m-Y',
+            'omschrijving'  => 'required',
+            'cat'           => 'required|numeric',
+            'prive'         => 'required|numeric',
+            'btw_bedrag'    => 'required|regex:' . $this->komma_getallen_regex,
+            'btw_tarief'    => 'required',
+            'bedrag'        => 'required|regex:' . $this->komma_getallen_regex,
+            'buitenland'    => 'required|numeric',
         ]);
 
-        $user_id        = $_GET['user_id'];
-        $id             = $_GET['id'];
-        $cat            = $_GET['cat'];
-        $omschrijving   = $_GET['omschrijving'];
-        $bedrag         = $_GET['bedrag'];
-        $btw_tarief     = $_GET['btw_tarief'];
-        $btw_bedrag     = $_GET['btw_bedrag'];
-        $btw            = $this->komma_naar_punt($bedrag) - $this->komma_naar_punt($btw_bedrag);
+        $bedrag         = $this->komma_naar_punt($_GET['bedrag']);
+        $btw_bedrag     = $this->komma_naar_punt($_GET['btw_bedrag']);
+        $btw            = $this->komma_naar_punt($bedrag - $btw_bedrag);
         $datum          = $_GET['datum'];
-        $buitenland     = $_GET['buitenland'];
-        $prive          = $_GET['prive'];
+        $jaar           = $this->getjaar($datum);
+        $kwartaal       = $this->kwartaal($datum);
 
         DB::connection('mysql2')->table('kosten')
             ->where([
-                'id' => $id,
-                'klant_id' => $user_id
+                'id'            => $_GET['id'],
+                'klant_id'      => $_GET['user_id']
             ])
             ->update([
-                'cat' => $cat,
-                'omschrijving' => $omschrijving,
-                'bedrag' => $this->komma_naar_punt($bedrag),
-                'btw_tarief' => $btw_tarief,
-                'btw_bedrag' => $this->komma_naar_punt($btw_bedrag),
-                'btw' => $this->komma_naar_punt($btw),
-                'datum' => $datum,
-                'jaar' => $this->getjaar($datum),
-                'kwartaal' => $this->kwartaal($datum),
-                'buitenland' => $buitenland,
-                'prive' => $prive,
-                'time' => strtotime($datum)
+                'cat'           => $_GET['cat'],
+                'omschrijving'  => $_GET['omschrijving'],
+                'bedrag'        => $bedrag,
+                'btw_tarief'    => $_GET['btw_tarief'],
+                'btw_bedrag'    => $btw_bedrag,
+                'btw'           => $btw,
+                'datum'         => $datum,
+                'jaar'          => $jaar,
+                'kwartaal'      => $kwartaal,
+                'buitenland'    => $_GET['buitenland'],
+                'prive'         => $_GET['prive'],
+                'time'          => strtotime($datum)
             ]);
     }
 
@@ -663,10 +628,10 @@ class UserController extends Controller
     // Update subpagina Uren & Kms
     public function updateUrenkm(Request $request) {
         $this->validate($request, [
-            'datum' => 'required|date_format:d-m-Y',
-            'omschrijving' => 'required',
-            'aantaluren' => 'required|regex:' . $this->komma_getallen,
-            'aantalkm' => 'required|regex:' . $this->komma_getallen,
+            'datum'         => 'required|date_format:d-m-Y',
+            'omschrijving'  => 'required',
+            'aantaluren'    => 'required|regex:' . $this->komma_getallen_regex,
+            'aantalkm'      => 'required|regex:' . $this->komma_getallen_regex,
         ]);
 
         $uren_id        = $_GET['id'];
@@ -680,44 +645,38 @@ class UserController extends Controller
         $uren           = $this->komma_naar_punt($_GET['aantaluren']);
         $km_count       = DB::connection('mysql2')->table('km')->where(['uren_id' => $uren_id])->count();
 
-        DB::connection('mysql2')
-            ->table('uren')->where([
-                'id' => $uren_id,
-                'klant_id' => $user_id
-            ])
+        DB::connection('mysql2')->table('uren')
+            ->where(['id' => $uren_id, 'klant_id' => $user_id])
             ->update([
-                'omschrijving' => $omschrijving,
-                'uren' => $uren,
-                'datum' => $datum,
-                'kwartaal' => $kwartaal,
-                'jaar' => $jaar,
-                'time' => $time
+                'omschrijving'  => $omschrijving,
+                'uren'          => $uren,
+                'datum'         => $datum,
+                'kwartaal'      => $kwartaal,
+                'jaar'          => $jaar,
+                'time'          => $time
             ]);
 
         // Als er nog geen rij in de km tabel staat, voeg er dan 1 toe
         if ($km_count === 0 && $km !== '0.00') {
-            DB::connection('mysql2')
-                ->table('km')->insert([
-                    'klant' => $user_id,
-                    'uren_id' => $uren_id,
-                    'km' => $km,
-                    'van' => '',
-                    'naar' => '',
-                    'datum' => $datum,
-                    'jaar' => $jaar,
-                    'time' => $time
+            DB::connection('mysql2')->table('km')
+                ->insert([
+                    'klant'     => $user_id,
+                    'uren_id'   => $uren_id,
+                    'km'        => $km,
+                    'van'       => '',
+                    'naar'      => '',
+                    'datum'     => $datum,
+                    'jaar'      => $jaar,
+                    'time'      => $time
                 ]);
         } else {
-            DB::connection('mysql2')
-                ->table('km')->where([
-                    'klant' => $user_id,
-                    'uren_id' => $uren_id
-                ])
+            DB::connection('mysql2')->table('km')
+                ->where(['klant' => $user_id, 'uren_id' => $uren_id])
                 ->update([
-                    'km' => $km,
-                    'datum' => $datum,
-                    'jaar' => $jaar,
-                    'time' => $time
+                    'km'        => $km,
+                    'datum'     => $datum,
+                    'jaar'      => $jaar,
+                    'time'      => $time
                 ]);
         }
         return $this->fetchUrenkm();
@@ -729,6 +688,9 @@ class UserController extends Controller
             case 'facturen':
                 DB::connection('mysql2')->table('facturen')->where(['factuur_id' => $_GET['id'], 'klant' => $_GET['user_id']])->delete();
                 DB::connection('mysql2')->table('fac_kosten')->where(['factuur_id' => $_GET['id'], 'klant_id' => $_GET['user_id']])->delete();
+                break;
+            case 'fackosten':
+                DB::connection('mysql2')->table('fac_kosten')->where(['kosten_id' => $_GET['id'], 'klant_id' => $_GET['user_id']])->delete();
                 break;
             case 'kosten':
                 DB::connection('mysql2')->table('kosten')->where(['id' => $_GET['id'], 'klant_id' => $_GET['user_id']])->delete();
