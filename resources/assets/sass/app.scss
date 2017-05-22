@@ -7,27 +7,29 @@
 // Bootstrap
 @import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
 
+/* Loadingscreen */
 #loading_screen {
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.35);
-  position: fixed;
-  z-index: 9999;
-  overflow: hidden;
-  background-image: url(../images/loading.svg);
-  background-repeat: no-repeat;
-  background-position: center center;
   display: none;
+  z-index: 9999;
+  position: fixed;
+  overflow: hidden;
+  background-repeat: no-repeat;
+  background-color: rgba(0,0,0,0.35);
+  background-position: center center;
+  background-image: url(../images/loading.svg);
 }
 
+/* Success message */
 #success-message {
-  width: 100%;
-  margin: 0 auto;
-  position: absolute;
   left: 0;
   top: 70px;
+  width: 100%;
   padding: 0 5%;
   z-index: 9999;
+  margin: 0 auto;
+  position: absolute;
 }
 
 .glyphicon-refresh-animate {
@@ -39,18 +41,19 @@
   to {-webkit-transform: rotate(360deg);}
 }
 
+/* Table */
 .table {
-  background-color: white;
   width: auto;
-  text-align: center;
-  padding: 0 15px;
   display: block;
+  padding: 0 15px;
+  text-align: center;
+  background-color: white;
   .table_header {
-    background-color: #786e64;
     color: white;
-    font-weight: bold;
     height: 30px;
     padding: 3px 5px;
+    font-weight: bold;
+    background-color: #786e64;
     div {
       padding: 0;
     }
@@ -75,8 +78,8 @@
     }
 
     .table_col {
-      word-wrap: break-word;
       padding: 3px 5px;
+      word-wrap: break-word;
     }
   }
 
@@ -85,6 +88,7 @@
   }
 }
 
+/* Dashboard pagina */
 #dashboard {
   .modal {
     .modal-body {
@@ -97,16 +101,16 @@
     }
 
     table {
-      border-collapse: collapse;
       border: 1px solid black;
+      border-collapse: collapse;
       td, th {
-        border: 1px solid black;
         padding: 5px;
+        border: 1px solid black;
       }
       .abbo-header {
-        text-align: center;
-        font-weight: bold;
         font-size: 1.2em;
+        font-weight: bold;
+        text-align: center;
       }
 
       .user-id {
@@ -127,8 +131,8 @@
       -webkit-box-shadow: 10px 10px 10px -7px rgba(0,0,0,0.6);
     }
     .dashboard-header {
-      text-align: center;
       margin-top: 0;
+      text-align: center;
     }
     .dashboard-users, .dashboard-user-count {
       button {
@@ -140,9 +144,9 @@
       .sub-count-p {
         margin: 0;
         width: 100%;
+        display: none;
         padding: 0 15px;
         text-align: right;
-        display: none;
       }
       a:hover {
         cursor: pointer;
@@ -152,6 +156,7 @@
   }
 }
 
+/* User pagina */
 #user {
   .modal {
     .modal-body {
@@ -234,6 +239,7 @@
   }
 }
 
+/* Factuurpagina */
 #factuur {
   .factuur_layer {
     padding: 0 0 5px 0;

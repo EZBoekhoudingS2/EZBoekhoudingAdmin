@@ -33,11 +33,11 @@
                                 <div class="col-xs-12 col-sm-6 field">
                                     <label for="{{ $key }}" class="col-xs-12 col-sm-3">{{ $label[$key] }}:</label>
                                     <div class="col-xs-12 col-sm-9">
-                                            @if ($key == 'id')
-                                                <input class="form-control" id="{{ $key }}" value="{{ $value }}" name="{{ $key }}" placeholder="{{ $key }}" disabled="disabled">
-                                            @else
-                                                <input class="form-control" id="{{ $key }}" value="{{ $value }}" name="{{ $key }}" placeholder="{{ $key }}">
-                                            @endif
+                                        @if ($key === 'id')
+                                            <input class="form-control" id="{{ $key }}" value="{{ $value }}" name="{{ $key }}" placeholder="{{ $key }}" disabled="disabled">
+                                        @else
+                                            <input class="form-control" id="{{ $key }}" value="{{ $value }}" name="{{ $key }}" placeholder="{{ $key }}">
+                                        @endif
                                     </div>
                                 </div>
                             @endforeach
@@ -46,7 +46,7 @@
                     <h3>Incasso:</h3>
                     <div class="row dropdowns">
                         <div class="col-xs-12 col-sm-4" id="active-div">
-                            <label for="active-dropdown">Actief/niet actief:</label>
+                            <label for="active-dropdown">Aan/uit:</label>
                             <select class="selectpicker" id="active-dropdown" name="active" data-width="100%">
                                 {!! $options[0] !!}
                                 {!! $options[1] !!}
@@ -58,18 +58,6 @@
                                 @foreach ($abonnementen as $abonnement)
                                     {!! $abonnement !!}
                                 @endforeach
-                            </select>
-                        </div>
-                        <div class="col-xs-12 col-sm-4" id="active-disabled-div">
-                            <label for="active-disabled-dropdown">Actief/niet actief:</label>
-                            <select class="selectpicker" id="active-disabled-dropdown" name="active-disabled" data-width="100%" readonly="readonly">
-                                <option value="0">Niet actief</option>
-                            </select>
-                        </div>
-                        <div class="col-xs-12 col-sm-4" id="abbo-disabled-div">
-                            <label for="abbo-disabled-dropdown">Abonnement:</label>
-                            <select class="selectpicker" id="abbo-disabled-dropdown" name="abbo-disabled" data-width="100%" readonly="readonly">
-                                <option value="0_3_2" selected="selected">Deep Purple (volledig pakket voor 30 dagen)</option>
                             </select>
                         </div>
                         <div class="col-xs-12 col-sm-4" id="trial-div">
@@ -406,6 +394,7 @@
     <script>
         // Globale variable van het maximaal aantal pagina's dat hij laat zien
         const max_pages = 10;
+        const user_id = $('#user_id').val();
 
         //Veranderd de Bedrag incl. input zodra er iets veranderd
         function btwCheck(where) {
@@ -480,7 +469,7 @@
                     $.ajax({
                         url: '/update_kosten',
                         data: {
-                            'user_id': $('#user_id').val(),
+                            'user_id': user_id,
                             'id': $('#' + page + '_id').val(),
                             'datum': $('#' + page + '_datum').val(),
                             'omschrijving': $('#' + page + '_omschrijving').val(),
@@ -525,7 +514,7 @@
                     $.ajax({
                         url: '/update_urenkm',
                         data: {
-                            'user_id': $('#user_id').val(),
+                            'user_id': user_id,
                             'id': $('#' + page + '_id').val(),
                             'datum': $('#' + page + '_datum').val(),
                             'omschrijving': $('#' + page + '_omschrijving').val(),
@@ -576,7 +565,7 @@
                     data: {
                         'page': page,
                         'id': row_id,
-                        'user_id': $('#user_id').val()
+                        'user_id': user_id
                     },
                     complete: function () {
                         $('#' + page + '_' + row_id).remove();
@@ -598,16 +587,22 @@
             $('#kostenEdit').find('span').css('display', 'none');
             $('#facturenEdit').find('span').css('display', 'none');
 
+            // Zet het huidige abonnement in deze variabele
+            var selected_abbo = $('#abbos-dropdown').val();
+
             //Laat de goede dropdowns zien op de Algemene pagina
             jQuery(function($) {
                 $('#trial-dropdown').on('change' ,function() {
                     if ($('#trial-dropdown').val() === '1') {
-                        $('#abbos-div, #active-div').hide();
-                        $('#abbo-disabled-div, #active-disabled-div').show();
+                        $('#active-dropdown').val('0').find('[value=1]').hide();
+                        $('#abbos-dropdown').find('option').hide().end().append(
+                            '<option id="trial-abbo" value="0_3_2" selected="selected">Deep Purple (volledig pakket voor 30 dagen)</option>'
+                        );
                     } else {
-                        $('#abbos-div, #active-div').show();
-                        $('#abbo-disabled-div, #active-disabled-div').hide();
+                        $('#active-dropdown').find('[value=1]').show();
+                        $('#abbos-dropdown').find('option').show().end().find('#trial-abbo').remove().end().val(selected_abbo);
                     }
+                    $('.selectpicker').selectpicker('refresh');
                 }).change();
             });
 

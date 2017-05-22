@@ -7688,27 +7688,29 @@ button.close {
   }
 }
 
+/* Loadingscreen */
 #loading_screen {
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.35);
-  position: fixed;
-  z-index: 9999;
-  overflow: hidden;
-  background-image: url(../images/loading.svg);
-  background-repeat: no-repeat;
-  background-position: center center;
   display: none;
+  z-index: 9999;
+  position: fixed;
+  overflow: hidden;
+  background-repeat: no-repeat;
+  background-color: rgba(0, 0, 0, 0.35);
+  background-position: center center;
+  background-image: url(../images/loading.svg);
 }
 
+/* Success message */
 #success-message {
-  width: 100%;
-  margin: 0 auto;
-  position: absolute;
   left: 0;
   top: 70px;
+  width: 100%;
   padding: 0 5%;
   z-index: 9999;
+  margin: 0 auto;
+  position: absolute;
 }
 
 .glyphicon-refresh-animate {
@@ -7725,20 +7727,21 @@ button.close {
   }
 }
 
+/* Table */
 .table {
-  background-color: white;
   width: auto;
-  text-align: center;
-  padding: 0 15px;
   display: block;
+  padding: 0 15px;
+  text-align: center;
+  background-color: white;
 }
 
 .table .table_header {
-  background-color: #786e64;
   color: white;
-  font-weight: bold;
   height: 30px;
   padding: 3px 5px;
+  font-weight: bold;
+  background-color: #786e64;
 }
 
 .table .table_header div {
@@ -7764,14 +7767,15 @@ button.close {
 
 .table #fackosten_layers .table_col,
 .table #factuur_layers .table_col, .table #kosten_layers .table_col, .table #urenkm_layers .table_col {
-  word-wrap: break-word;
   padding: 3px 5px;
+  word-wrap: break-word;
 }
 
 .table #factuur_layers > div, .table #kosten_layers > div, .table #urenkm_layers > div {
   display: none;
 }
 
+/* Dashboard pagina */
 #dashboard .modal .modal-body {
   float: left;
   width: 100%;
@@ -7782,19 +7786,19 @@ button.close {
 }
 
 #dashboard .modal table {
-  border-collapse: collapse;
   border: 1px solid black;
+  border-collapse: collapse;
 }
 
 #dashboard .modal table td, #dashboard .modal table th {
-  border: 1px solid black;
   padding: 5px;
+  border: 1px solid black;
 }
 
 #dashboard .modal table .abbo-header {
-  text-align: center;
-  font-weight: bold;
   font-size: 1.2em;
+  font-weight: bold;
+  text-align: center;
 }
 
 #dashboard .modal table .user-id {
@@ -7816,8 +7820,8 @@ button.close {
 }
 
 #dashboard .dashboard-div .dashboard-header {
-  text-align: center;
   margin-top: 0;
+  text-align: center;
 }
 
 #dashboard .dashboard-div .dashboard-users button, #dashboard .dashboard-div .dashboard-user-count button {
@@ -7831,9 +7835,9 @@ button.close {
 #dashboard .dashboard-div .dashboard-users .sub-count-p, #dashboard .dashboard-div .dashboard-user-count .sub-count-p {
   margin: 0;
   width: 100%;
+  display: none;
   padding: 0 15px;
   text-align: right;
-  display: none;
 }
 
 #dashboard .dashboard-div .dashboard-users a:hover, #dashboard .dashboard-div .dashboard-user-count a:hover {
@@ -7841,6 +7845,7 @@ button.close {
   text-decoration: none;
 }
 
+/* User pagina */
 #user .modal .modal-body {
   float: left;
   width: 100%;
@@ -7922,6 +7927,7 @@ button.close {
   display: none;
 }
 
+/* Factuurpagina */
 #factuur .factuur_layer {
   padding: 0 0 5px 0;
 }

@@ -10,8 +10,14 @@ class UserController extends Controller
 
     public $komma_getallen_regex = '/^\d{1,}(,?\d{1,2})?$/'; // Regex accepteert komma getallen
 
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     // Weergeeft de algemene pagina
-    public function index($user_id) {
+    public function index($user_id)
+    {
         $show_user      = DB::connection('mysql2')->table('users')->select('id', 'email', 'vnaam', 'anaam', 'straat', 'postcode', 'plaats', 'telefoon', 'bedrijfsnaam', 'iban', 'iban_naam', 'btw', 'kvk')->where(['id' => $user_id])->get();
         $current_sub    = DB::connection('mysql2')->table('betaling_uniek')->where(['user_id' => $user_id, 'vld_time' => (DB::connection('mysql2')->table('betaling_uniek')->max('vld_time'))])->get();
         $facturen       = DB::connection('mysql2')->table('facturen')->where(['klant_id' => $user_id])->orderBy('time', 'desc')->get();
@@ -23,28 +29,29 @@ class UserController extends Controller
         $kilometers     = DB::connection('mysql2')->table('km')->where(['klant' => $user_id])->get();
         $korting        = DB::connection('mysql2')->table('korting_generiek')->get();
         $kosten_cat     = DB::connection('mysql2')->table('kosten_cat')->get();
+        $abonnementen   = array();
+        $options        = array();
+        $rules          = array();
+        $trial          = array();
         $maandjaar      = null;
-        $abonnementen   = [];
-        $options        = [];
-        $rules          = [];
-        $trial          = [];
+        $currently      = '(huidig)';
         $trial_info     = '';
         $abbo           = '';
         $max_rows       = 20;
         $label          = array(
-            'id' => 'Id',
-            'email' => 'Emailadres',
-            'vnaam' => 'Voornaam',
-            'anaam' => 'Achternaam',
-            'straat' => 'Adres',
-            'postcode' => 'Postcode',
-            'plaats' => 'Plaats',
-            'telefoon' => 'Telefoonnummer',
-            'bedrijfsnaam' => 'Bedrijfsnaam',
-            'iban' => 'IBAN',
-            'iban_naam' => 'IBAN naam',
-            'btw' => 'Btw',
-            'kvk' => 'KvK'
+            'id'            => 'Id',
+            'email'         => 'Emailadres',
+            'vnaam'         => 'Voornaam',
+            'anaam'         => 'Achternaam',
+            'straat'        => 'Adres',
+            'postcode'      => 'Postcode',
+            'plaats'        => 'Plaats',
+            'telefoon'      => 'Telefoonnummer',
+            'bedrijfsnaam'  => 'Bedrijfsnaam',
+            'iban'          => 'IBAN',
+            'iban_naam'     => 'IBAN naam',
+            'btw'           => 'Btw',
+            'kvk'           => 'KvK'
         );
 
         if (!empty($incasso[0]) && $incasso[0]->active == 1) {
@@ -52,16 +59,16 @@ class UserController extends Controller
                 array_push($rules, [0 . '_' . $betaling[$i]->user_type . '_' . $betaling[$i]->id . '_' . $betaling[$i]->type => $betaling[$i]->titel]);
                 if ($current_user[0]->type == 0 && $current_user[0]->user == $betaling[$i]->user_type && $betaling[$i]->type == $incasso[0]->maandjaar) {
                     // ALS DE KLANT GEEN GEBRUIKT MAAKT VAN KORTING MAAR WEL INCASSO
-                    $abbo = $betaling[$i]->titel;
-                    $maandjaar = $betaling[$i]->type;
+                    $abbo       = $betaling[$i]->titel;
+                    $maandjaar  = $betaling[$i]->type;
                 }
             }
             for ($i = 0; $i < count($korting); $i++) {
                 array_push($rules, [$korting[$i]->spec_user . '_' . $korting[$i]->user_type . '_' . $korting[$i]->id . '_' . $korting[$i]->type => $korting[$i]->titel]);
                 if ($current_user[0]->type > 0 && $korting[$i]->spec_user == $current_user[0]->type && $korting[$i]->user_type == $current_user[0]->user && $korting[$i]->type == $incasso[0]->maandjaar) {
                     // ALS DE KLANT WEL GEBRUIKT MAAKT VAN KORTING EN INCASSO
-                    $abbo = $korting[$i]->titel;
-                    $maandjaar = $korting[$i]->type;
+                    $abbo       = $korting[$i]->titel;
+                    $maandjaar  = $korting[$i]->type;
                 }
             }
         } else {
@@ -70,16 +77,16 @@ class UserController extends Controller
                     array_push($rules, [0 . '_' . $betaling[$i]->user_type . '_' . $betaling[$i]->id . '_' . $betaling[$i]->type => $betaling[$i]->titel]);
                     if ($current_user[0]->type == 0 && $current_user[0]->user == $betaling[$i]->user_type && $current_sub[0]->abbo_id == $betaling[$i]->id) {
                         // ALS DE KLANT GEEN GEBRUIK MAAKT VAN KORTING EN INCASSO
-                        $abbo = $betaling[$i]->titel;
-                        $maandjaar = $betaling[$i]->type;
+                        $abbo       = $betaling[$i]->titel;
+                        $maandjaar  = $betaling[$i]->type;
                     }
                 }
                 for ($i = 0; $i < count($korting); $i++) {
                     array_push($rules, [$korting[$i]->spec_user . '_' . $korting[$i]->user_type . '_' . $korting[$i]->id . '_' . $korting[$i]->type => $korting[$i]->titel]);
                     if ($current_user[0]->type > 0 && $current_user[0]->type == $korting[$i]->spec_user && $current_user[0]->user == $korting[$i]->user_type && $current_sub[0]->abbo_id == $korting[$i]->id) {
                         // ALS DE KLANT WEL GEBRUIK MAAKT VAN KORTING MAAR GEEN INCASSO
-                        $abbo = $korting[$i]->titel;
-                        $maandjaar = $korting[$i]->type;
+                        $abbo       = $korting[$i]->titel;
+                        $maandjaar  = $korting[$i]->type;
                     }
                 }
             } else {
@@ -87,55 +94,55 @@ class UserController extends Controller
                     array_push($rules, [0 . '_' . $betaling[$i]->user_type . '_' . $betaling[$i]->id . '_' . $betaling[$i]->type => $betaling[$i]->titel]);
                     if ($current_user[0]->type == 0 && $current_user[0]->user == $betaling[$i]->user_type) {
                         // ALS DE KLANT GEEN GEBRUIK MAAKT VAN KORTING EN INCASSO
-                        $abbo = $betaling[$i]->titel;
-                        $maandjaar = $betaling[$i]->type;
+                        $abbo       = $betaling[$i]->titel;
+                        $maandjaar  = $betaling[$i]->type;
                     }
                 }
                 for ($i = 0; $i < count($korting); $i++) {
                     array_push($rules, [$korting[$i]->spec_user . '_' . $korting[$i]->user_type . '_' . $korting[$i]->id . '_' . $korting[$i]->type => $korting[$i]->titel]);
                     if ($current_user[0]->type > 0 && $current_user[0]->type == $korting[$i]->spec_user && $current_user[0]->user == $korting[$i]->user_type) {
                         // ALS DE KLANT WEL GEBRUIK MAAKT VAN KORTING MAAR GEEN INCASSO
-                        $abbo = $korting[$i]->titel;
-                        $maandjaar = $korting[$i]->type;
+                        $abbo       = $korting[$i]->titel;
+                        $maandjaar  = $korting[$i]->type;
                     }
                 }
             }
         }
 
         if ($current_user[0]->trial == 0) {
-            array_push($trial, '<option value="0" selected="selected">Nee (momenteel)</option>');
+            array_push($trial, '<option value="0" selected="selected">Nee ' . $currently . '</option>');
             array_push($trial, '<option value="1">Ja</option>');
             if (!empty($current_sub[0])) {
                 if (!empty($incasso[0])) {
                     if ($incasso[0]->active == 0) {
-                        array_push($options, '<option value="0" selected="selected">Niet actief (momenteel)</option>');
-                        array_push($options, '<option value="1">Actief</option>');
+                        array_push($options, '<option value="0" selected="selected">Uit ' . $currently . '</option>');
+                        array_push($options, '<option value="1">Aan</option>');
                     } else {
                         if ($current_sub[0]->time <= $incasso[0]->time) {
-                            array_push($options, '<option value="0">Niet actief</option>');
-                            array_push($options, '<option value="1" selected="selected">Actief (momenteel)</option>');
+                            array_push($options, '<option value="0">Uit</option>');
+                            array_push($options, '<option value="1" selected="selected">Aan ' . $currently . '</option>');
                         }
                     }
                 } else {
-                    array_push($options, '<option value="0" selected="selected">Niet actief (momenteel)</option>');
-                    array_push($options, '<option value="1">Actief</option>');
+                    array_push($options, '<option value="0" selected="selected">Uit ' . $currently . '</option>');
+                    array_push($options, '<option value="1">Aan</option>');
                 }
             } else {
                 if (!empty($incasso[0]) && $incasso[0]->active == 1) {
-                    array_push($options, '<option value="0">Niet actief</option>');
-                    array_push($options, '<option value="1" selected="selected">Actief (momenteel)</option>');
+                    array_push($options, '<option value="0">Uit</option>');
+                    array_push($options, '<option value="1" selected="selected">Aan ' . $currently . '</option>');
                 } else {
-                    array_push($options, '<option value="0" selected="selected">Niet actief (momenteel)</option>');
-                    array_push($options, '<option value="1">Actief</option>');
+                    array_push($options, '<option value="0" selected="selected">Uit ' . $currently . '</option>');
+                    array_push($options, '<option value="1">Aan</option>');
                 }
             }
         } else {
-            $days = abs(strtotime(date('d-m-Y')) - strtotime($current_user[0]->datum))/86400;
+            $days = abs(strtotime(date('d-m-Y')) - strtotime($current_user[0]->datum)) / 86400;
             $trial_info = '<span class="side-text">(deze klant heeft nog een trial lopen van <b>' . $days . '</b> dagen)</span>';
-            array_push($options, '<option value="0" selected="selected">Niet actief (momenteel)</option>');
-            array_push($options, '<option value="1">Actief</option>');
+            array_push($options, '<option value="0" selected="selected">Aan ' . $currently . '</option>');
+            array_push($options, '<option value="1">Uit</option>');
             array_push($trial, '<option value="0">Nee</option>');
-            array_push($trial, '<option value="1" selected="selected">Ja (momenteel)</option>');
+            array_push($trial, '<option value="1" selected="selected">Ja ' . $currently . '</option>');
         }
 
         for($a = 0; $a < count($rules); $a++) {
@@ -143,15 +150,15 @@ class UserController extends Controller
                 $key = explode('_', $key)[0] . '_' . explode('_', $key)[1] . '_' . explode('_', $key)[3];
                 if (explode('_', $key)[2] == 2) {
                     if ($value == $abbo && $maandjaar == 2) {
-                        array_push($abonnementen, '<option id="' . 'm' . explode('_', $key)[2] . '" value="' .$key . '" selected="selected">' . $value .' (per maand) (momenteel)</option>');
+                        array_push($abonnementen, '<option value="' .$key . '" selected="selected">' . $value .' (per maand) ' . $currently . '</option>');
                     } else {
-                        array_push($abonnementen, '<option id="' . 'm' . explode('_', $key)[2] . '" value="' .$key . '">' . $value .' (per maand)</option>');
+                        array_push($abonnementen, '<option value="' .$key . '">' . $value .' (per maand)</option>');
                     }
                 } else {
                     if ($value == $abbo && $maandjaar == 1) {
-                        array_push($abonnementen, '<option id="' . 'j' . explode('_', $key)[2] . '" value="' .$key . '" selected="selected">' . $value .' (per jaar) (momenteel)</option>');
+                        array_push($abonnementen, '<option value="' .$key . '" selected="selected">' . $value .' (per jaar) ' . $currently . '</option>');
                     } else {
-                        array_push($abonnementen, '<option id="' . 'j' . explode('_', $key)[2] . '" value="' .$key . '">' . $value .' (per jaar)</option>');
+                        array_push($abonnementen, '<option value="' .$key . '">' . $value .' (per jaar)</option>');
                     }
                 }
             }
@@ -204,7 +211,8 @@ class UserController extends Controller
     }
 
     // Update de algemene pagina
-    public function update(Request $request) {
+    public function update(Request $request)
+    {
         $this->validate($request, [
             'email'     => 'required|email',
             'straat'    => 'regex:/^([\p{L}a-zA-Z.? ]{3,30}\s[0-9]{1,5}([a-zA-Z]{1,3})?)?$/',
@@ -213,8 +221,8 @@ class UserController extends Controller
         ]);
 
         $trial              = $_POST['trial'];
-        $sub                = ($trial === '1') ? $_POST['abbo-disabled'] : $_POST['abbos'];
-        $active             = ($trial === '1') ? $_POST['active-disabled'] : $_POST['active'];
+        $sub                = $_POST['abbos'];
+        $active             = $_POST['active'];
         $user_id            = $_POST['user_id'];
         $_POST['email']     = strtolower($_POST['email']);
         $_POST['straat']    = ucfirst($_POST['straat']);
@@ -222,31 +230,31 @@ class UserController extends Controller
         $_POST['postcode']  = str_replace(' ', '', strtoupper($_POST['postcode']));
         $incasso_count      = DB::connection('mysql2')->table('incasso')->where(['user_id' => $user_id])->count();
 
+        $type               = explode('_', $sub)[0];
+        $user               = explode('_', $sub)[1];
+        $maandjaar          = explode('_', $sub)[2];
 
         if ($incasso_count !== 0) {
-            DB::connection('mysql2')
-                ->table('incasso')
+            DB::connection('mysql2')->table('incasso')
                 ->where(['user_id' => $user_id])
-                ->update(['active' => $active, 'maandjaar' => explode('_', $sub)[2]]);
+                ->update(['active' => $active, 'maandjaar' => $maandjaar]);
         } else {
-            DB::connection('mysql2')
-                ->table('incasso')
+            DB::connection('mysql2')->table('incasso')
                 ->insert([
                     'user_id'   => $user_id,
-                    'active'    => 1,
-                    'maandjaar' => explode('_', $sub)[2],
+                    'active'    => $active,
+                    'maandjaar' => $maandjaar,
                     'date'      => date('d-m-Y'),
                     'time'      => time()
                 ]);
         }
 
-        DB::connection('mysql2')
-            ->table('users')
+        DB::connection('mysql2')->table('users')
             ->where(['id' => $user_id])
             ->update([
-                'type'  => explode('_', $sub)[0],
-                'user'  => explode('_', $sub)[1],
-                'trial' => $trial
+                'type'          => $type,
+                'user'          => $user,
+                'trial'         => $trial
             ]);
 
         \App\Users::updateOrCreate(['id' => $user_id], $_POST);
@@ -261,29 +269,24 @@ class UserController extends Controller
     }
 
     // Weergeeft subpagina Factuuroverzicht
-    public function fetchFacturen($klant_id, $factuur_id) {
-        $current_user = DB::connection('mysql2')->table('users')->where(['id' => $klant_id])->get();
-        $landen = DB::connection('mysql2')->table('landen')->orderBy('land', 'asc')->get();
-        $facturen = DB::connection('mysql2')->table('facturen')
+    public function fetchFacturen($klant_id, $factuur_id)
+    {
+        $current_user   = DB::connection('mysql2')->table('users')->where(['id' => $klant_id])->get();
+        $landen         = DB::connection('mysql2')->table('landen')->orderBy('land', 'asc')->get();
+        $facturen       = DB::connection('mysql2')->table('facturen')
             ->select(
                 'factuur_id', 'klant_id', 'factuur_nr', 'klant', 'adres', 'tav', 'email', 'voldaan',
                 'datum', 'type', 'verlegd_btw', 'land_code', 'land_particulier',
                 'verstuurd', 'verst_0', 'verst_1', 'verst_2', 'img', 'termijn'
             )
-            ->where([
-                'factuur_id'    => $factuur_id,
-                'klant_id'      => $klant_id
-            ])->get();
+            ->where(['factuur_id' => $factuur_id, 'klant_id' => $klant_id])->get();
 
         $fackosten = DB::connection('mysql2')->table('fac_kosten')
             ->select(
                 'kosten_id', 'factuur_id', 'klant_id', 'bedrag', 'btw_bedrag',
                 'btw_tarief', 'btw', 'omschrijving', 'kwartaal', 'jaar', 'type'
             )
-            ->where([
-                'factuur_id'    => $factuur_id,
-                'klant_id'      => $klant_id
-            ])->get();
+            ->where(['factuur_id' => $factuur_id, 'klant_id' => $klant_id])->get();
 
         $land = array();
         $labels = array(
@@ -395,7 +398,8 @@ class UserController extends Controller
     }
 
     // Update subpagina Factuuroverzicht
-    public function updateFacturen(Request $request) {
+    public function updateFacturen(Request $request)
+    {
         $this->validate($request, [
             'klant_email'           => 'required|email',
             'klant_vnaam'           => 'required',
@@ -496,7 +500,8 @@ class UserController extends Controller
     }
 
     // Weergeeft kostenposten
-    public function fetchFackosten() {
+    public function fetchFackosten()
+    {
         $fac_kosten = (isset($_GET['kosten_id']))
             ? DB::connection('mysql2')->table('fac_kosten')
                 ->where(['kosten_id' => $_GET['kosten_id'], 'klant_id' => $_GET['klant_id']])->get()
@@ -511,7 +516,8 @@ class UserController extends Controller
     }
 
     // Voegt een kostenpost toe
-    public function addFackosten(Request $request) {
+    public function addFackosten(Request $request)
+    {
         $this->validate($request, [
             'omschrijving'  => 'required',
             'bedrag'        => 'required',
@@ -540,7 +546,8 @@ class UserController extends Controller
     }
 
     // Update kostenposten
-    public function updateFackosten() {
+    public function updateFackosten()
+    {
         if (isset($_GET['request']) && $_GET['request'] === 'type') {
             // Update types van alle kostenposten
             for ($i = 0; $i < $_GET['count']; $i++) {
@@ -564,7 +571,8 @@ class UserController extends Controller
     }
 
     // Weergeeft subpagina kostenoverzicht
-    public function fetchKosten() {
+    public function fetchKosten()
+    {
         $kosten = DB::connection('mysql2')->table('kosten')->where(['id' => $_GET['id']])->get();
         $kosten[0]->btw_bedrag = $this->punt_naar_komma($kosten[0]->btw_bedrag);
         $kosten[0]->bedrag = $this->punt_naar_komma($kosten[0]->bedrag);
@@ -572,7 +580,8 @@ class UserController extends Controller
     }
 
     // Update subpagina kostenoverzicht
-    public function updateKosten(Request $request) {
+    public function updateKosten(Request $request)
+    {
         $this->validate($request, [
             'datum'         => 'required|date_format:d-m-Y',
             'omschrijving'  => 'required',
@@ -587,9 +596,9 @@ class UserController extends Controller
         $bedrag         = $this->komma_naar_punt($_GET['bedrag']);
         $btw_bedrag     = $this->komma_naar_punt($_GET['btw_bedrag']);
         $btw            = $this->komma_naar_punt($bedrag - $btw_bedrag);
-        $datum          = $_GET['datum'];
-        $jaar           = $this->getjaar($datum);
-        $kwartaal       = $this->kwartaal($datum);
+        $jaar           = $this->getjaar($_GET['datum']);
+        $kwartaal       = $this->kwartaal($_GET['datum']);
+        $time           = strtotime($_GET['datum']);
 
         DB::connection('mysql2')->table('kosten')
             ->where([
@@ -603,17 +612,18 @@ class UserController extends Controller
                 'btw_tarief'    => $_GET['btw_tarief'],
                 'btw_bedrag'    => $btw_bedrag,
                 'btw'           => $btw,
-                'datum'         => $datum,
+                'datum'         => $_GET['datum'],
                 'jaar'          => $jaar,
                 'kwartaal'      => $kwartaal,
                 'buitenland'    => $_GET['buitenland'],
                 'prive'         => $_GET['prive'],
-                'time'          => strtotime($datum)
+                'time'          => $time
             ]);
     }
 
     // Weergeeft subpagina Uren & Kms
-    public function fetchUrenkm() {
+    public function fetchUrenkm()
+    {
         $urenkm = DB::connection('mysql2')->table('uren')
             ->leftJoin('km', 'uren.id', '=', 'km.uren_id')
             ->where('uren.id', $_GET['id'])
@@ -626,7 +636,8 @@ class UserController extends Controller
     }
 
     // Update subpagina Uren & Kms
-    public function updateUrenkm(Request $request) {
+    public function updateUrenkm(Request $request)
+    {
         $this->validate($request, [
             'datum'         => 'required|date_format:d-m-Y',
             'omschrijving'  => 'required',
@@ -683,7 +694,8 @@ class UserController extends Controller
     }
 
     // Verwijdert rijen uit de database
-    public function removeRow() {
+    public function removeRow()
+    {
         switch($_GET['page']) {
             case 'facturen':
                 DB::connection('mysql2')->table('facturen')->where(['factuur_id' => $_GET['id'], 'klant' => $_GET['user_id']])->delete();

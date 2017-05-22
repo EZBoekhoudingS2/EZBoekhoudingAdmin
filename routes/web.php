@@ -17,10 +17,7 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home',                     'HomeController@index');
-
 Route::get('/dashboard',                'DashboardController@index');
-
 Route::get('/user/{id}',                'UserController@index');
 Route::post('/user/{id}',               'UserController@update');
 Route::get('/user/{id}/{factuur_id}',   'UserController@fetchFacturen');
@@ -34,6 +31,3 @@ Route::get('/update_kosten',            'UserController@updateKosten');
 Route::get('/fetch_urenkm',             'UserController@fetchUrenkm');
 Route::get('/update_urenkm',            'UserController@updateUrenkm');
 Route::get('/remove_row',               'UserController@removeRow');
-
-Route::get('temp',                      'TempController@index');
-Route::post('temp/update',              'TempController@update');
