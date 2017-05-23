@@ -31,3 +31,4 @@ Route::get('/update_kosten',            'UserController@updateKosten');
 Route::get('/fetch_urenkm',             'UserController@fetchUrenkm');
 Route::get('/update_urenkm',            'UserController@updateUrenkm');
 Route::get('/remove_row',               'UserController@removeRow');
+Route::get('/betalingen',               'BetalingenController@index');

@@ -7760,13 +7760,19 @@ button.close {
   padding: 0;
 }
 
+.table #betalingen_layers .table_layer,
 .table #fackosten_layers .table_layer,
-.table #factuur_layers .table_layer, .table #kosten_layers .table_layer, .table #urenkm_layers .table_layer {
+.table #factuur_layers .table_layer,
+.table #kosten_layers .table_layer,
+.table #urenkm_layers .table_layer {
   border-bottom: 1px solid #dddddd;
 }
 
+.table #betalingen_layers .table_col,
 .table #fackosten_layers .table_col,
-.table #factuur_layers .table_col, .table #kosten_layers .table_col, .table #urenkm_layers .table_col {
+.table #factuur_layers .table_col,
+.table #kosten_layers .table_col,
+.table #urenkm_layers .table_col {
   padding: 3px 5px;
   word-wrap: break-word;
 }

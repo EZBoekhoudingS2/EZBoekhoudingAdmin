@@ -71,8 +71,11 @@
     padding: 0;
   }
 
+  #betalingen_layers,
   #fackosten_layers,
-  #factuur_layers, #kosten_layers, #urenkm_layers {
+  #factuur_layers,
+  #kosten_layers,
+  #urenkm_layers {
     .table_layer {
       border-bottom: 1px solid #dddddd;
     }
