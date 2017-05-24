@@ -7760,19 +7760,11 @@ button.close {
   padding: 0;
 }
 
-.table #betalingen_layers .table_layer,
-.table #fackosten_layers .table_layer,
-.table #factuur_layers .table_layer,
-.table #kosten_layers .table_layer,
-.table #urenkm_layers .table_layer {
+.table .table_layer {
   border-bottom: 1px solid #dddddd;
 }
 
-.table #betalingen_layers .table_col,
-.table #fackosten_layers .table_col,
-.table #factuur_layers .table_col,
-.table #kosten_layers .table_col,
-.table #urenkm_layers .table_col {
+.table .table_col {
   padding: 3px 5px;
   word-wrap: break-word;
 }
@@ -8001,6 +7993,12 @@ button.close {
 #factuur #add-new-row button {
   float: right;
   margin-bottom: 5px;
+}
+
+#betalingen_i .table, #betalingen_i .payments-no, #betalingen_i .payments-yes {
+  display: none;
+  margin-top: 0;
+  text-align: center;
 }
 
 /*# sourceMappingURL=app.css.map */

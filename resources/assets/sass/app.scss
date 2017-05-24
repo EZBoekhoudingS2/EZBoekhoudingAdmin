@@ -71,11 +71,11 @@
     padding: 0;
   }
 
-  #betalingen_layers,
-  #fackosten_layers,
-  #factuur_layers,
-  #kosten_layers,
-  #urenkm_layers {
+  //#betalingen_layers,
+  //#fackosten_layers,
+  //#factuur_layers,
+  //#kosten_layers,
+  //#urenkm_layers {
     .table_layer {
       border-bottom: 1px solid #dddddd;
     }
@@ -84,7 +84,7 @@
       padding: 3px 5px;
       word-wrap: break-word;
     }
-  }
+  //}
 
   #factuur_layers > div, #kosten_layers > div, #urenkm_layers > div {
     display: none;
@@ -305,5 +305,13 @@
       float: right;
       margin-bottom: 5px;
     }
+  }
+}
+
+#betalingen_i {
+  .table, .payments-no, .payments-yes {
+    display: none;
+    margin-top: 0;
+    text-align: center;
   }
 }

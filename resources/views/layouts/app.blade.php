@@ -40,6 +40,7 @@
                     @if (!Auth::guest())
                         <ul class="nav navbar-nav navbar-left">
                             <li><a href="{{ url('/dashboard') }}">Dashboard</a></li>
+                            <li><a href="{{ url('/betalingen') }}">iDeal Betalingen</a></li>
                         </ul>
                     @endif
                 </div>
@@ -79,8 +80,8 @@
     </div>
     </div>
     <!-- Scripts -->
-    <script src="/js/app.js"></script>
     <script type="text/javascript" src="/js/custom.js"></script>
+    <script src="/js/app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/js/bootstrap-select.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
     @yield('extra_js')
