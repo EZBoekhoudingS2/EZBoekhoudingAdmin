@@ -75,8 +75,8 @@
 
             {{--BETALINGEN PAGINA--}}
             <div role="tabpanel" class="tab-pane fade" id="betalingen">
-                <div class="col-xs-6">
-                    @if (empty($uren[0]))
+                <div class="col-xs-12">
+                    @if (empty($betalingen[0]))
                         <p class="empty-alert">Er zijn nog geen iDeal betalingen doorgevoerd door deze gebruiker!</p>
                     @else
                         <div class="table">
@@ -93,9 +93,9 @@
                                             <div class="table_col col-xs-8 text-left">{{ $betalingen[$i - 1]->titel }}</div>
                                             <div class="table_col col-xs-2 text-right">&euro; {{ $betalingen[$i - 1]->bedrag_in }}</div>
                                         </div>
-                                        @if ($i % $max_rows == 0)
+                                        @if ($i % $maxRowsB == 0)
                                             </div>
-                                            <div role="tabpanel" class="tab-pane fade" id="betaling_page{{ ceil($i / $max_rows) + 1 }}">
+                                            <div role="tabpanel" class="tab-pane fade" id="betaling_page{{ ceil($i / $maxRowsB) + 1 }}">
                                             @continue
                                         @endif
                                     @endfor
@@ -107,8 +107,59 @@
                                 <li class="first_page" role="presentation" aria-label="First"><span aria-hidden="true">&laquo;</span></li>
                                 <li class="previous_page" role="presentation" aria-label="Previous"><span aria-hidden="true">&lt;</span></li>
                                 <li class="more_left disabled" role="presentation"><a aria-expanded="true">...</a></li>
-                                @for ($j = 1; $j <= ceil(count($betalingen) / $max_rows); $j++)
+                                @for ($j = 1; $j <= ceil(count($betalingen) / $maxRowsB); $j++)
                                     <li class="pages" role="presentation"><a data-toggle="tab" href="#betaling_page{{ $j }}">{{ $j }}</a></li>
+                                @endfor
+                                <li class="more_right disabled" role="presentation"><a aria-expanded="true">...</a></li>
+                                <li class="next_page" role="presentation" aria-label="Next"><span aria-hidden="true">&gt;</span></li>
+                                <li class="last_page" role="presentation" aria-label="Last"><span aria-hidden="true">&raquo;</span></li>
+                            </ul>
+                        </div>
+                    @endif
+                    @if (empty($betalingen[0]))
+                        <p class="empty-alert">Er zijn nog geen incasso's doorgevoerd door deze gebruiker!</p>
+                    @else
+                        <div class="table">
+                            <div class="row table_header">
+                                <div class="col-xs-2 text-left">Beschrijving incasso</div>
+                                <div class="col-xs-1">Bedrag</div>
+                                <div class="col-xs-2">Referentie</div>
+                                <div class="col-xs-2">Beschrijving</div>
+                                <div class="col-xs-1">Datum</div>
+                                <div class="col-xs-2">Factuurnummer</div>
+                                <div class="col-xs-1">Voltooid</div>
+                                <div class="col-xs-1">Verlengd</div>
+                            </div>
+                            <div id="incasso_layers">
+                                <div role="tabpanel" class="tab-pane fade in active" id="incasso_page1">
+                                    @for ($i = 1; $i <= count($sepa_incasso); $i++)
+                                        <div id="incasso_{{ $sepa_incasso[$i - 1]->id }}" class="row table_layer">
+                                            <input class="incasso_id" type="hidden" value="{{ $sepa_incasso[$i - 1]->id }}">
+                                            <div class="table_col col-xs-2 beschrijving_incasso text-left">{{ $sepa_incasso[$i - 1]->beschrijving_incasso }}</div>
+                                            <div class="table_col col-xs-1 bedrag">&euro; {{ $sepa_incasso[$i - 1]->bedrag }}</div>
+                                            <div class="table_col col-xs-2 ref">{{ $sepa_incasso[$i - 1]->ref }}</div>
+                                            <div class="table_col col-xs-2 beschrijving">{{ $sepa_incasso[$i - 1]->beschrijving }}</div>
+                                            <div class="table_col col-xs-1 collection_date">{{ $sepa_incasso[$i - 1]->collection_date }}</div>
+                                            <div class="table_col col-xs-2 mandate_id">{{ $sepa_incasso[$i - 1]->mandate_id }}</div>
+                                            <div class="table_col col-xs-1 succes">{!! $sepa_incasso[$i - 1]->succes !!}</div>
+                                            <div class="table_col col-xs-1 verlegt">{!! $sepa_incasso[$i - 1]->verlengt !!}</div>
+                                        </div>
+                                        @if ($i % $maxRowsB == 0)
+                                            </div>
+                                            <div role="tabpanel" class="tab-pane fade" id="incasso_page{{ ceil($i / $maxRowsB) + 1 }}">
+                                            @continue
+                                        @endif
+                                    @endfor
+                                </div>
+                            </div>
+                        </div>
+                        <div class="page_list">
+                            <ul id="incasso_pagination" class="pagination">
+                                <li class="first_page" role="presentation" aria-label="First"><span aria-hidden="true">&laquo;</span></li>
+                                <li class="previous_page" role="presentation" aria-label="Previous"><span aria-hidden="true">&lt;</span></li>
+                                <li class="more_left disabled" role="presentation"><a aria-expanded="true">...</a></li>
+                                @for ($j = 1; $j <= ceil(count($sepa_incasso) / $maxRowsB); $j++)
+                                    <li class="pages" role="presentation"><a data-toggle="tab" href="#incasso_page{{ $j }}">{{ $j }}</a></li>
                                 @endfor
                                 <li class="more_right disabled" role="presentation"><a aria-expanded="true">...</a></li>
                                 <li class="next_page" role="presentation" aria-label="Next"><span aria-hidden="true">&gt;</span></li>
@@ -161,9 +212,9 @@
                                             </div>
                                         </div>
                                     </div>
-                                    @if ($i % $max_rows == 0)
+                                    @if ($i % $maxRows == 0)
                                         </div>
-                                        <div role="tabpanel" class="tab-pane fade" id="factuur_page{{ ceil($i / $max_rows) + 1 }}">
+                                        <div role="tabpanel" class="tab-pane fade" id="factuur_page{{ ceil($i / $maxRows) + 1 }}">
                                         @continue
                                     @endif
                                 @endfor
@@ -175,7 +226,7 @@
                             <li class="first_page" role="presentation" aria-label="First"><span aria-hidden="true">&laquo;</span></li>
                             <li class="previous_page" role="presentation" aria-label="Previous"><span aria-hidden="true">&lt;</span></li>
                             <li class="more_left disabled" role="presentation"><a aria-expanded="true">...</a></li>
-                            @for ($j = 1; $j <= ceil(count($facturen) / $max_rows); $j++)
+                            @for ($j = 1; $j <= ceil(count($facturen) / $maxRows); $j++)
                                 <li class="pages" role="presentation"><a data-toggle="tab" href="#factuur_page{{ $j }}">{{ $j }}</a></li>
                             @endfor
                             <li class="more_right disabled" role="presentation"><a aria-expanded="true">...</a></li>
@@ -308,9 +359,9 @@
                                             <a onclick="removeRow({{ $kosten[$i - 1]->id }}, 'kosten')"><img src="{{ url('images/busy.png') }}" title="Verwijderen"></a>
                                         </div>
                                     </div>
-                                    @if ($i % $max_rows == 0)
+                                    @if ($i % $maxRows == 0)
                                         </div>
-                                        <div role="tabpanel" class="tab-pane fade" id="kosten_page{{ ceil($i / $max_rows) + 1 }}">
+                                        <div role="tabpanel" class="tab-pane fade" id="kosten_page{{ ceil($i / $maxRows) + 1 }}">
                                         @continue
                                     @endif
                                 @endfor
@@ -322,7 +373,7 @@
                             <li class="first_page" role="presentation" aria-label="First"><span aria-hidden="true">&laquo;</span></li>
                             <li class="previous_page" role="presentation" aria-label="Previous"><span aria-hidden="true">&lt;</span></li>
                             <li class="more_left disabled" role="presentation"><a aria-expanded="true">...</a></li>
-                            @for ($j = 1; $j <= ceil(count($kosten) / $max_rows); $j++)
+                            @for ($j = 1; $j <= ceil(count($kosten) / $maxRows); $j++)
                                 <li class="pages" role="presentation"><a data-toggle="tab" href="#kosten_page{{ $j }}">{{ $j }}</a></li>
                             @endfor
                             <li class="more_right disabled" role="presentation"><a aria-expanded="true">...</a></li>
@@ -407,9 +458,9 @@
                                             <a onclick="removeRow({{ $uren[$i - 1]->id }}, 'urenkm')"><img src="{{ url('images/busy.png') }}" title="Verwijderen"></a>
                                         </div>
                                     </div>
-                                    @if ($i % $max_rows == 0)
+                                    @if ($i % $maxRows == 0)
                                         </div>
-                                        <div role="tabpanel" class="tab-pane fade" id="urenkm_page{{ ceil($i / $max_rows) + 1 }}">
+                                        <div role="tabpanel" class="tab-pane fade" id="urenkm_page{{ ceil($i / $maxRows) + 1 }}">
                                         @continue
                                     @endif
                                 @endfor
@@ -421,7 +472,7 @@
                             <li class="first_page" role="presentation" aria-label="First"><span aria-hidden="true">&laquo;</span></li>
                             <li class="previous_page" role="presentation" aria-label="Previous"><span aria-hidden="true">&lt;</span></li>
                             <li class="more_left disabled" role="presentation"><a aria-expanded="true">...</a></li>
-                            @for ($j = 1; $j <= ceil(count($uren) / $max_rows); $j++)
+                            @for ($j = 1; $j <= ceil(count($uren) / $maxRows); $j++)
                                 <li class="pages" role="presentation"><a data-toggle="tab" href="#urenkm{{ $j }}">{{ $j }}</a></li>
                             @endfor
                             <li class="more_right disabled" role="presentation"><a aria-expanded="true">...</a></li>
@@ -440,7 +491,7 @@
         const max_pages         = 10;
         const user_id           = $('#user_id').val();
         const selected_abbo     = $('#abbos-dropdown').val();
-        const paginas           = ['betaling', 'factuur', 'kosten', 'urenkm'];
+        const paginas           = ['betaling', 'incasso', 'factuur', 'kosten', 'urenkm'];
 
         //Veranderd de Bedrag incl. input zodra er iets veranderd
         function btwCheck(where) {
@@ -626,6 +677,32 @@
             }
         }
 
+        $('#incasso_layers').find('.succes').click(function() {
+            var voltooid    = '';
+            var input       = $(this).find('input[type=hidden]');
+            var id          = input.parents('.table_layer').find('.incasso_id').val();
+
+            switch(input.val()) {
+                case '0':
+                    voltooid = 1;
+                    input.parents('.table_layer').find('.succes').html('<a href="#"><input type="hidden" value="1"><img src="/images/check.png"></a>');
+                    break;
+                case '1':
+                    voltooid = 0;
+                    input.parents('.table_layer').find('.succes').html('<a href="#"><input type="hidden" value="0"><img src="/images/busy.png"></a>');
+                    break;
+            }
+
+            $.ajax({
+                url: '/incasso/toggle',
+                data: {
+                    'id':       id,
+                    'user_id':  user_id,
+                    'voltooid': voltooid
+                }
+            });
+        });
+
         $(document).ready(function() {
             // Als er een succesbericht is, verdwijnt ie in 5 seconden
             $('#success-message').fadeOut(5000);
@@ -658,6 +735,7 @@
                 const layers          = $('#' + pagina + '_layers').children();
                 const pages           = pagination.find('.pages');
                 pages.first().addClass('active');
+                layers.css('display', 'none');
                 layers.first().css('display', 'block');
                 if (layers.last().children().length === 0) {
                     layers.last().remove();

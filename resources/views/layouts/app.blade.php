@@ -40,6 +40,7 @@
                     @if (!Auth::guest())
                         <ul class="nav navbar-nav navbar-left">
                             <li><a href="{{ url('/dashboard') }}">Dashboard</a></li>
+                            <li><a href="{{ url('/users') }}">Gebruikers</a></li>
                             <li><a href="{{ url('/betalingen') }}">iDeal Betalingen</a></li>
                         </ul>
                     @endif

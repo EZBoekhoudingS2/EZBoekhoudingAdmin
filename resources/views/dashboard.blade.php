@@ -39,14 +39,15 @@
             </div>
         </div>
         <div class="dashboard-div col-xs-12 col-sm-6">
-            <div class="dashboard-user-count">
-                <h3 class="dashboard-header">Gebruikersaantallen</h3>
-                @foreach($user_count as $key => $value)
-                    <div class="user-count row">
-                        <div class="col-xs-10">{{ $key }} gebruikers:</div>
-                        <div class="user-count-num col-xs-2"><a href="#">{{ $value }}</a></div>
-                    </div>
-                @endforeach
+            <div class="dashboard-user-types">
+                <h3 class="dashboard-header">Gebruikerssoorten</h3>
+                <canvas id="userTypes" width="200" height="100"></canvas>
+            </div>
+        </div>
+        <div class="dashboard-div col-xs-12 col-sm-6">
+            <div class="dashboard-sub-count">
+                <h3 class="dashboard-header">Abonnement Aantallen</h3>
+                <canvas id="userCount" width="200" height="100"></canvas>
             </div>
         </div>
         <div class="dashboard-div col-xs-12 col-sm-6">
@@ -55,7 +56,7 @@
                 <div class="form-group">
                     <select class="selectpicker" id="user-dropdown" name="user" title="Selecteer een gebruiker..." data-width="100%">
                         @foreach ($users as $user)
-                            <option value="{{ $user->id }}" name="{{ $user->id }}">{{ $user->email }}</option>
+                            <option value="{{ $user->id }}" name="{{ $user->id }}">{{ '(' . $user->id . ') ' . $user->email }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -66,7 +67,7 @@
         </div>
         <div class="dashboard-div col-xs-12 col-sm-6">
             <div class="dashboard-user-count">
-                <h3 class="dashboard-header">Gebruikerssoorten</h3>
+                <h3 class="dashboard-header">Gebruikersaantallen</h3>
                 @foreach ($subs as $subs_type)
                     @foreach ($subs_type as $sub)
                         <div class="user-count sub-count row">
@@ -79,12 +80,6 @@
                         </div>
                     @endforeach
                 @endforeach
-            </div>
-        </div>
-        <div class="dashboard-div col-xs-12 col-sm-6">
-            <div class="dashboard-user-chart">
-                <h3 class="dashboard-header">Gebruikersgrafiek</h3>
-                <canvas id="userChart" width="250" height="200"></canvas>
             </div>
         </div>
     </div>
@@ -110,20 +105,26 @@
             });
         });
 
-        var sub_labels = [];
-        var sub_values = [];
+        var userTypesLabels = [];
+        var userTypesValues = [];
+        @foreach($user_count as $key => $value)
+            userTypesLabels.push('{{ $key }}');
+            userTypesValues.push('{{ $value }}');
+        @endforeach
+
+        var subCountLabels = [];
+        var subCountValues = [];
         @foreach ($subs as $subs_type)
             @foreach ($subs_type as $sub)
-                sub_labels.push('{{ $sub['title'] }}');
-                sub_values.push('{{ $sub[0] }}');
+                subCountLabels.push('{{ $sub['title'] }}');
+                subCountValues.push('{{ $sub[0] }}');
             @endforeach
         @endforeach
 
-        const chart = $('#userChart');
-        var userChart = new Chart(chart, {
+        var userTypes = new Chart($('#userTypes'), {
             type: 'pie',
             data: {
-                labels: sub_labels,
+                labels: userTypesLabels,
                 datasets: [{
                     backgroundColor: [
                         '#00008b',
@@ -135,7 +136,33 @@
                         '#ff1493',
                         '#a0522d'
                     ],
-                    data: sub_values
+                    data: userTypesValues
+                }]
+            },
+            options: {
+                cutoutPercentage: 60,
+                animation: {
+                    animateScale: true
+                }
+            }
+        });
+
+        var userCount = new Chart($('#userCount'), {
+            type: 'pie',
+            data: {
+                labels: subCountLabels,
+                datasets: [{
+                    backgroundColor: [
+                        '#00008b',
+                        '#f1c40f',
+                        '#e67e22',
+                        '#16a085',
+                        '#2980b9',
+                        '#ff2828',
+                        '#ff1493',
+                        '#a0522d'
+                    ],
+                    data: subCountValues
                 }]
             },
             options: {
