@@ -38,36 +38,21 @@
                 </div>
             </div>
         </div>
-        <div class="dashboard-div col-xs-12 col-sm-6">
+        <div class="dashboard-div col-xs-12 col-sm-6 col-md-4">
             <div class="dashboard-user-types">
                 <h3 class="dashboard-header">Gebruikerssoorten</h3>
                 <canvas id="userTypes" width="200" height="100"></canvas>
             </div>
         </div>
-        <div class="dashboard-div col-xs-12 col-sm-6">
+        <div class="dashboard-div col-xs-12 col-sm-6 col-md-4">
             <div class="dashboard-sub-count">
-                <h3 class="dashboard-header">Abonnement Aantallen</h3>
+                <h3 class="dashboard-header">Abonnementen</h3>
                 <canvas id="userCount" width="200" height="100"></canvas>
             </div>
         </div>
-        <div class="dashboard-div col-xs-12 col-sm-6">
-            <div class="dashboard-users">
-                <h3 class="dashboard-header">Alle gebruikers</h3>
-                <div class="form-group">
-                    <select class="selectpicker" id="user-dropdown" name="user" title="Selecteer een gebruiker..." data-width="100%">
-                        @foreach ($users as $user)
-                            <option value="{{ $user->id }}" name="{{ $user->id }}">{{ '(' . $user->id . ') ' . $user->email }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <a id="btn-id">
-                    <button class="btn btn-default" type="button">Bekijk</button>
-                </a>
-            </div>
-        </div>
-        <div class="dashboard-div col-xs-12 col-sm-6">
+        <div class="dashboard-div col-xs-12 col-sm-6 col-md-4">
             <div class="dashboard-user-count">
-                <h3 class="dashboard-header">Gebruikersaantallen</h3>
+                <h3 class="dashboard-header">Abonnement aantallen</h3>
                 @foreach ($subs as $subs_type)
                     @foreach ($subs_type as $sub)
                         <div class="user-count sub-count row">
@@ -80,6 +65,21 @@
                         </div>
                     @endforeach
                 @endforeach
+            </div>
+        </div>
+        <div class="dashboard-div col-xs-12 col-sm-6 col-md-4">
+            <div class="dashboard-users">
+                <h3 class="dashboard-header">Alle gebruikers</h3>
+                <div class="form-group">
+                    <select class="selectpicker" id="user-dropdown" name="user" title="Selecteer een gebruiker..." data-width="100%">
+                        @foreach ($users as $user)
+                            <option value="{{ $user->id }}" name="{{ $user->id }}">{{ '(' . $user->id . ') ' . $user->email }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <a id="btn-id">
+                    <button class="btn btn-default" type="button">Bekijk</button>
+                </a>
             </div>
         </div>
     </div>
@@ -143,9 +143,13 @@
                 cutoutPercentage: 60,
                 animation: {
                     animateScale: true
+//                },
+//                legend: {
+//                    display: false
                 }
             }
         });
+
 
         var userCount = new Chart($('#userCount'), {
             type: 'pie',
@@ -169,6 +173,9 @@
                 cutoutPercentage: 60,
                 animation: {
                     animateScale: true
+//                },
+//                legend: {
+//                    display: false
                 }
             }
         });

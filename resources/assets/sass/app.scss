@@ -7,6 +7,20 @@
 // Bootstrap
 @import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
 
+body {
+  background-color: #ebeff2;
+}
+
+//.navbar {
+//  background-color: #68a4c6!important;
+//  div, a, ul, li, * {
+//    color: white!important;
+//  }
+//  .dropdown-toggle {
+//    background-color: #68a4c6!important;
+//  }
+//}
+
 /* Loadingscreen */
 #loading_screen {
   width: 100%;
@@ -52,8 +66,8 @@
     color: white;
     height: 30px;
     padding: 3px 5px;
-    font-weight: bold;
-    background-color: #786e64;
+    font-weight: normal;
+    background-color: #9f9f9f;
     div {
       padding: 0;
     }
@@ -113,15 +127,16 @@
   }
 
   .dashboard-div {
-    margin-bottom: 20px;
+    margin-bottom: 15px;
+    padding: 0 7.5px;
     > div {
       height: 100%;
       padding: 15px;
       min-height: 160px;
       background-color: white;
-      box-shadow: 10px 10px 10px -7px rgba(0,0,0,0.6);
-      -moz-box-shadow: 10px 10px 10px -7px rgba(0,0,0,0.6);
-      -webkit-box-shadow: 10px 10px 10px -7px rgba(0,0,0,0.6);
+      //box-shadow: 10px 10px 10px -7px rgba(0,0,0,0.6);
+      //-moz-box-shadow: 10px 10px 10px -7px rgba(0,0,0,0.6);
+      //-webkit-box-shadow: 10px 10px 10px -7px rgba(0,0,0,0.6);
     }
     .dashboard-header {
       margin-top: 0;
@@ -305,149 +320,231 @@
     text-align: center;
   }
 }
+
 #adresboek {
   padding: 0;
   .element {
     padding: 0;
-    position: relative;
     overflow: hidden;
-    -webkit-border-radius: 15px;
-    -moz-border-radius: 15px;
-    border-radius: 7.5px;
-    background: #fefefe;
+    position: relative;
+    background-color: #fefefe;
     .element-header {
-      background: #571b58;
       height: 50px;
       padding: 12.5px;
       position: relative;
+      background-color: #68a4c6;
       h2 {
         color: white;
-        font-weight: bold;
         font-size: 18px;
+        font-weight: 100;
         position: absolute;
         margin: 2.5px 0 0 0;
+        text-transform: capitalize;
       }
       input {
-        border: none;
-        border-radius: 80px;
-        float: right;
-        margin: 0;
         width: 0;
-        text-indent: 300px;
-        padding: 0 12.5px;
+        margin: 0;
+        border: none;
+        float: right;
         height: 25px;
         color: white;
         font-size: 12px;
-        -ms-transition: .25s ease-in-out;
-        -moz-transition: .25s ease-in-out;
-        -o-transition: .25s ease-in-out;
-        -webkit-transition: .25s ease-in-out;
+        padding: 0 12.5px;
+        text-indent: 300px;
+        border-radius: 80px;
         transition: .25s ease-in-out;
+        -o-transition: .25s ease-in-out;
+        -moz-transition: .25s ease-in-out;
+        -webkit-transition: .25s ease-in-out;
       }
       .inner-addon {
         position: relative;
       }
       .inner-addon .glyphicon {
-        position: absolute;
         padding: 10px;
+        position: absolute;
         pointer-events: none;
       }
       .right-addon .glyphicon {
-        right: 0px;
-        padding: 5px;
+        right: 0;
+        padding: 4px 5px 0 0;
       }
       input:focus + * {
         display: none;
       }
       input:focus {
+        width: 100%;
+        text-indent: 0;
         color: #858585;
         text-align: left;
-        text-indent: 0;
         padding: 0 11px 0 22px;
-        width: 100%;
       }
     }
     .element-content {
+      overflow: hidden;
       position: relative;
       .element-sidebar {
-        background-color: #dedede;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 10;
         width: 17px;
         padding-top: 3px;
         text-align: center;
         position: absolute;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        z-index: 10;
+        background-color: #bfbfbf;
         a {
+          color: #ffffff;
           display: block;
-          color: #aaa;
-          text-decoration: none;
-          line-height: 14px;
           font-size: 11px;
+          line-height: 14px;
+          text-decoration: none;
         }
         a:hover {
-          color: #888;
-          text-decoration: underline;
+          font-weight: bold;
+          transition: .1s ease-in-out;
+          -webkit-transform: scale(1.6);
+          -o-transition: .1s ease-in-out;
+          -moz-transition: .1s ease-in-out;
+          -webkit-transition: .1s ease-in-out;
         }
       }
       .list {
         margin: 0;
         padding: 0;
+        width: 100%;
         height: 386px;
         overflow: auto;
+        padding-right: 17px;
+        box-sizing: content-box;
         li {
-          .contact_name {
+          margin: 5px;
+          background-color: #ebeff2;
+          a, a:hover {
+            margin: 0;
             display: block;
+            width: 100%;
+            height: 100%;
+            text-decoration: none;
+          }
+          .user_name {
             padding: 8px;
             color: #727272;
+            display: block;
+            cursor: pointer;
             font-size: 13px;
             font-weight: bold;
             text-decoration: none;
-            cursor: pointer;
             a, a:hover, a:focus {
               color: inherit;
             }
           }
-
-          .email {
+          .user_email {
             display: block;
             color: #b5b5b5;
             font-size: 11px;
             font-weight: normal;
             text-decoration: none;
           }
+          .selected {
+            border-left: 5px solid #bbbbbb;
+          }
+          :hover {
+            background-color: #e0e4e7;
+          }
         }
-
-        li:nth-child(even) {
-          background-color: #ededed;
-        }
-
-        //li:hover {
-        //  background-color: #ddd;
-        //}
       }
-
       .contact_buttons {
         width: calc(100% - 16px);
       }
+    }
+  }
+}
+// Card
+@media screen and (min-width: 0px) and (max-width: 767px) {
+  #card {
+    margin-top: 30px;
+  }
 
-      #add_contact, #delete_contact {
-        border: 0;
-        border-right: 1px solid #adadad;
-        border-radius: 0;
-        display: block;
-        padding: 8px;
-        font-size: 12px;
-        background-color: #f5f5f5;
-        background-image: -webkit-gradient(linear, left top, left bottom, from(#f5f5f5), to(#dddddd));
-        background-image: -webkit-linear-gradient(top, #f5f5f5, #dddddd);
-        background-image: -moz-linear-gradient(top, #f5f5f5, #dddddd);
-        background-image: -ms-linear-gradient(top, #f5f5f5, #dddddd);
-        background-image: -o-linear-gradient(top, #f5f5f5, #dddddd);
-        background-image: linear-gradient(to bottom, #f5f5f5, #dddddd);
-        filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#f5f5f5, endColorstr=#dddddd);
+  #card-inputs {
+    margin: 0 auto;
+  }
+
+  ul {
+    width: 100%;
+  }
+}
+@media screen and (min-width: 768px) and (max-width: 991px) {
+  #card {
+    margin-top: 30px;
+  }
+  #card-inputs {
+    ul {
+      width: 203.124px;
+    }
+  }
+}
+
+
+#card {
+  float: right;
+  display: none;
+  padding: 15px;
+  min-height: 300px;
+  border-radius: 15px;
+  -moz-border-radius: 15px;
+  border: 3px solid #cdcdcd;
+  -webkit-border-radius: 15px;
+  //background-image: -webkit-gradient(linear, left top, left bottom, from(#f4f5f5), to(#dfdddd));
+  //background-image: -webkit-linear-gradient(top, #f4f5f5, #dfdddd);
+  //background-image: -moz-linear-gradient(top, #f4f5f5, #dfdddd);
+  //background-image: -ms-linear-gradient(top, #f4f5f5, #dfdddd);
+  //background-image: -o-linear-gradient(top, #f4f5f5, #dfdddd);
+  //background-image: linear-gradient(to bottom, #f4f5f5, #dfdddd);
+  //filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#f4f5f5, endColorstr=#dfdddd);
+
+  .card-head {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .loading-text {
+    display: none;
+    text-align: center;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 0;
+     list-style: none;
+  }
+
+  .glyphicon-user {
+    padding: 0;
+    font-size: 145px;
+  }
+
+  #card-text {
+    .small-info {
+      padding: 15px;
+      span {
+        float: right;
+      }
+      p {
+        margin: 0;
       }
     }
+  }
+
+  .edit-user {
+    right: 0;
+    bottom: 0;
+    margin: 15px;
+    position: absolute;
+  }
+
+  label, ul li:nth-last-child(1) input {
+    margin: 0;
   }
 }

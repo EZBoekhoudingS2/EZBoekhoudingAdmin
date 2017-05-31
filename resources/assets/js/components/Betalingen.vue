@@ -15,7 +15,7 @@
                             </select>
                         </div>
                         <div class="col-xs-4">
-                            <input class="btn btn-primary form-control" value="Bekijken" type="button" @click="fetchBetalingen">
+                            <input class="btn btn-primary form-control" value="Bekijken" type="button" v-on:click="fetchBetalingen">
                         </div>
                     </div>
                 </div>

@@ -122,13 +122,13 @@
                         <div class="table">
                             <div class="row table_header">
                                 <div class="col-xs-2 text-left">Beschrijving incasso</div>
-                                <div class="col-xs-1">Bedrag</div>
                                 <div class="col-xs-2">Referentie</div>
                                 <div class="col-xs-2">Beschrijving</div>
                                 <div class="col-xs-1">Datum</div>
                                 <div class="col-xs-2">Factuurnummer</div>
                                 <div class="col-xs-1">Voltooid</div>
                                 <div class="col-xs-1">Verlengd</div>
+                                <div class="col-xs-1 text-right">Bedrag</div>
                             </div>
                             <div id="incasso_layers">
                                 <div role="tabpanel" class="tab-pane fade in active" id="incasso_page1">
@@ -136,13 +136,13 @@
                                         <div id="incasso_{{ $sepa_incasso[$i - 1]->id }}" class="row table_layer">
                                             <input class="incasso_id" type="hidden" value="{{ $sepa_incasso[$i - 1]->id }}">
                                             <div class="table_col col-xs-2 beschrijving_incasso text-left">{{ $sepa_incasso[$i - 1]->beschrijving_incasso }}</div>
-                                            <div class="table_col col-xs-1 bedrag">&euro; {{ $sepa_incasso[$i - 1]->bedrag }}</div>
                                             <div class="table_col col-xs-2 ref">{{ $sepa_incasso[$i - 1]->ref }}</div>
                                             <div class="table_col col-xs-2 beschrijving">{{ $sepa_incasso[$i - 1]->beschrijving }}</div>
                                             <div class="table_col col-xs-1 collection_date">{{ $sepa_incasso[$i - 1]->collection_date }}</div>
                                             <div class="table_col col-xs-2 mandate_id">{{ $sepa_incasso[$i - 1]->mandate_id }}</div>
                                             <div class="table_col col-xs-1 succes">{!! $sepa_incasso[$i - 1]->succes !!}</div>
                                             <div class="table_col col-xs-1 verlegt">{!! $sepa_incasso[$i - 1]->verlengt !!}</div>
+                                            <div class="table_col col-xs-1 bedrag text-right">&euro; {{ $sepa_incasso[$i - 1]->bedrag }}</div>
                                         </div>
                                         @if ($i % $maxRowsB == 0)
                                             </div>
@@ -178,7 +178,7 @@
                     <div class="table">
                         <div class="row table_header">
                             <div class="col-xs-9">
-                                <div class="col-xs-1 text-left">ID</div>
+                                <div class="col-xs-1 text-left">Id</div>
                                 <div class="col-xs-2">Datum</div>
                                 <div class="col-xs-2">Factuurnummer</div>
                                 <div class="col-xs-2">Type</div>
@@ -334,7 +334,7 @@
                 @else
                     <div class="table">
                         <div class="row table_header">
-                            <div class="col-xs-1 text-left">ID</div>
+                            <div class="col-xs-1 text-left">Id</div>
                             <div class="col-xs-1">Datum</div>
                             <div class="col-xs-2">Omschrijving</div>
                             <div class="col-xs-3">Categorie</div>
@@ -435,7 +435,7 @@
                 @else
                     <div class="table">
                         <div class="row table_header">
-                            <div class="col-xs-1 text-left">ID</div>
+                            <div class="col-xs-1 text-left">Id</div>
                             <div class="col-xs-1">Datum</div>
                             <div class="col-xs-3">Omschrijving</div>
                             <div class="col-xs-2">Aantal uren</div>
@@ -553,7 +553,7 @@
                             break;
                         default:
                             alert('An error has occured. Check your Console to view the error.');
-                            console.log('Unknown page "' + page + '" or unknown row ID "' + row_id + '"');
+                            console.log('Unknown page "' + page + '" or unknown row id "' + row_id + '"');
                     }
                 },
                 complete: function() {
