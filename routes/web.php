@@ -22,7 +22,9 @@ Auth::routes();
 
 Route::get('/dashboard',                'DashboardController@index');
 Route::get('/users',                    'UsersController@index');
-Route::get('/users/api',                'UsersController@api');
+Route::get('/users/subs',               'UsersController@subs');
+Route::get('/users/fetch_all',          'UsersController@fetchAll');
+Route::get('/users/fetch_user',         'UsersController@fetchUser');
 Route::get('/user/{id}',                'UserInfoController@index');
 Route::post('/user/{id}',               'UserInfoController@update');
 Route::get('/user/{id}/{factuur_id}',   'UserInfoController@fetchFacturen');

@@ -69,7 +69,7 @@
                             </select>
                         </div>
                     </div>
-                    <input class="btn btn-default" type="submit" value="Opslaan">
+                    <input class="btn btn-default save-user" type="submit" value="Opslaan">
                 </form>
             </div>
 

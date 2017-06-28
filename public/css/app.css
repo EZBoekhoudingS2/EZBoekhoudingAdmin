@@ -7692,6 +7692,39 @@ body {
   background-color: #ebeff2;
 }
 
+/* InLineContent */
+.in-line-1 {
+  width: 100%;
+}
+
+.in-line-2 {
+  width: calc((100% / 2) - 1%);
+}
+
+.in-line-3 {
+  width: calc((100% / 3) - 1%);
+}
+
+.in-line-4 {
+  width: calc((100% / 4) - 1%);
+}
+
+.in-line-5 {
+  width: calc((100% / 5) - 1%);
+}
+
+.in-line-6 {
+  width: calc((100% / 6) - 1%);
+}
+
+.in-line-7 {
+  width: calc((100% / 7) - 1%);
+}
+
+.in-line-8 {
+  width: calc((100% / 8) - 1%);
+}
+
 /* Loadingscreen */
 #loading_screen {
   width: 100%;
@@ -7744,8 +7777,8 @@ body {
   color: white;
   height: 30px;
   padding: 3px 5px;
-  font-weight: normal;
-  background-color: #9f9f9f;
+  font-weight: bold;
+  background-color: #786e64;
 }
 
 .table .table_header div {
@@ -7774,6 +7807,60 @@ body {
 }
 
 /* Dashboard pagina */
+#dashboard .dashboard-panel {
+  border-radius: 5px;
+  background: #ffffff;
+  margin-bottom: 15px;
+  border: 1px solid #d3d3d3;
+}
+
+#dashboard .dashboard-panel .panel-header {
+  font-size: 13px;
+  text-align: left;
+  padding: 3px 5px;
+  font-weight: bold;
+  border-top-left-radius: 10%;
+  border-top-right-radius: 10%;
+  border-bottom: 1px solid #d3d3d3;
+  background-image: linear-gradient(to bottom, #f7f7f7, #f1f1f1);
+  background-image: -webkit-linear-gradient(top, #f7f7f7, #f1f1f1);
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#f7f7f7), to(#f1f1f1));
+  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#f7f7f7, endColorstr=#f1f1f1);
+}
+
+#dashboard .dashboard-panel .panel-content {
+  width: 100%;
+  margin: auto;
+  padding: 5px 15px;
+}
+
+#dashboard .dashboard-panel .panel-content .panel-number {
+  font-size: 100px;
+  font-weight: bold;
+  text-align: center;
+}
+
+#dashboard .dashboard-panel .panel-content button {
+  float: right;
+}
+
+#dashboard .dashboard-panel .panel-content .user-count-num {
+  text-align: right;
+}
+
+#dashboard .dashboard-panel .panel-content .sub-count-p {
+  margin: 0;
+  width: 100%;
+  display: none;
+  padding: 0 15px;
+  text-align: right;
+}
+
+#dashboard .dashboard-panel .panel-content a:hover {
+  cursor: pointer;
+  text-decoration: none;
+}
+
 #dashboard .modal .modal-body {
   float: left;
   width: 100%;
@@ -7803,44 +7890,6 @@ body {
   text-align: right;
 }
 
-#dashboard .dashboard-div {
-  margin-bottom: 15px;
-  padding: 0 7.5px;
-}
-
-#dashboard .dashboard-div > div {
-  height: 100%;
-  padding: 15px;
-  min-height: 160px;
-  background-color: white;
-}
-
-#dashboard .dashboard-div .dashboard-header {
-  margin-top: 0;
-  text-align: center;
-}
-
-#dashboard .dashboard-div .dashboard-users button, #dashboard .dashboard-div .dashboard-user-count button {
-  float: right;
-}
-
-#dashboard .dashboard-div .dashboard-users .user-count-num, #dashboard .dashboard-div .dashboard-user-count .user-count-num {
-  text-align: right;
-}
-
-#dashboard .dashboard-div .dashboard-users .sub-count-p, #dashboard .dashboard-div .dashboard-user-count .sub-count-p {
-  margin: 0;
-  width: 100%;
-  display: none;
-  padding: 0 15px;
-  text-align: right;
-}
-
-#dashboard .dashboard-div .dashboard-users a:hover, #dashboard .dashboard-div .dashboard-user-count a:hover {
-  cursor: pointer;
-  text-decoration: none;
-}
-
 /* User pagina */
 #user .modal .modal-body {
   float: left;
@@ -7855,7 +7904,7 @@ body {
   padding-right: 5px;
 }
 
-#user .save_user {
+#user .save-user {
   margin-top: 10px;
 }
 
@@ -7993,7 +8042,7 @@ body {
   margin-bottom: 5px;
 }
 
-#betalingen_i .table, #betalingen_i .payments-no, #betalingen_i .payments-yes {
+#betalingen_i .table, #betalingen_i .payments-no {
   display: none;
   margin-top: 0;
   text-align: center;
@@ -8003,18 +8052,40 @@ body {
   padding: 0;
 }
 
+#adresboek #sublegend {
+  padding: 0;
+  background-color: #ffffff;
+}
+
+#adresboek #sublegend .legend-head {
+  text-decoration: underline;
+}
+
+#adresboek #sublegend label {
+  margin: 0;
+  font-weight: normal;
+}
+
+#adresboek #sublegend label input[type="checkbox"] {
+  margin-right: 5px;
+}
+
+#adresboek #sublegend label:checked:before {
+  content: '\25CF';
+}
+
 #adresboek .element {
   padding: 0;
   overflow: hidden;
   position: relative;
-  background-color: #fefefe;
+  background-color: #ffffff;
 }
 
 #adresboek .element .element-header {
   height: 50px;
   padding: 12.5px;
   position: relative;
-  background-color: #68a4c6;
+  background-color: #1187ed;
 }
 
 #adresboek .element .element-header h2 {
@@ -8032,7 +8103,7 @@ body {
   border: none;
   float: right;
   height: 25px;
-  color: white;
+  color: #ffffff;
   font-size: 12px;
   padding: 0 12.5px;
   text-indent: 300px;
@@ -8041,6 +8112,19 @@ body {
   -o-transition: .25s ease-in-out;
   -moz-transition: .25s ease-in-out;
   -webkit-transition: .25s ease-in-out;
+}
+
+#adresboek .element .element-header input:focus {
+  width: 100%;
+  outline: none;
+  text-indent: 0;
+  color: #666666;
+  text-align: left;
+  padding: 0 11px 0 22px;
+}
+
+#adresboek .element .element-header input:focus + * {
+  display: none;
 }
 
 #adresboek .element .element-header .inner-addon {
@@ -8058,36 +8142,95 @@ body {
   padding: 4px 5px 0 0;
 }
 
-#adresboek .element .element-header input:focus + * {
-  display: none;
-}
-
-#adresboek .element .element-header input:focus {
-  width: 100%;
-  text-indent: 0;
-  color: #858585;
-  text-align: left;
-  padding: 0 11px 0 22px;
-}
-
 #adresboek .element .element-content {
+  height: 386px;
   overflow: hidden;
   position: relative;
+}
+
+#adresboek .element .element-content .list {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  list-style: none;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  box-sizing: content-box;
+}
+
+#adresboek .element .element-content .list li {
+  margin: 5px;
+  background-color: #ebeff2;
+}
+
+#adresboek .element .element-content .list li a, #adresboek .element .element-content .list li a:hover {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  text-decoration: none;
+}
+
+#adresboek .element .element-content .list li .user_info {
+  padding: 8px;
+  color: #666666;
+  display: block;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+#adresboek .element .element-content .list li .user_info .user_email {
+  display: block;
+  color: #a9a9a9;
+  font-size: 11px;
+  font-weight: normal;
+  text-decoration: none;
+}
+
+#adresboek .element .element-content .list li .user_info a, #adresboek .element .element-content .list li .user_info a:hover, #adresboek .element .element-content .list li .user_info a:focus {
+  color: inherit;
+}
+
+#adresboek .element .element-content .list li .user_sub {
+  float: right;
+  margin: -40px 22.5px 0 0;
+}
+
+#adresboek .element .element-content .list li .user_active {
+  float: right;
+  font-size: 15px;
+  margin: -42px 10px 0 0;
+}
+
+#adresboek .element .element-content .list li .user_active:before {
+  content: '\25CF';
+}
+
+#adresboek .element .element-content .list li .selected {
+  border-left: 5px solid #666666;
+}
+
+#adresboek .element .element-content .list li:hover {
+  background-color: #e0e4e7;
 }
 
 #adresboek .element .element-content .element-sidebar {
   top: 0;
   right: 0;
   bottom: 0;
-  z-index: 10;
   width: 17px;
+  z-index: 10;
   padding-top: 3px;
   text-align: center;
   position: absolute;
-  background-color: #bfbfbf;
+  background-color: #b8b9bb;
 }
 
 #adresboek .element .element-content .element-sidebar a {
+  z-index: 15;
   color: #ffffff;
   display: block;
   font-size: 11px;
@@ -8102,63 +8245,6 @@ body {
   -o-transition: .1s ease-in-out;
   -moz-transition: .1s ease-in-out;
   -webkit-transition: .1s ease-in-out;
-}
-
-#adresboek .element .element-content .list {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 386px;
-  overflow: auto;
-  padding-right: 17px;
-  box-sizing: content-box;
-}
-
-#adresboek .element .element-content .list li {
-  margin: 5px;
-  background-color: #ebeff2;
-}
-
-#adresboek .element .element-content .list li a, #adresboek .element .element-content .list li a:hover {
-  margin: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-  text-decoration: none;
-}
-
-#adresboek .element .element-content .list li .user_name {
-  padding: 8px;
-  color: #727272;
-  display: block;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: bold;
-  text-decoration: none;
-}
-
-#adresboek .element .element-content .list li .user_name a, #adresboek .element .element-content .list li .user_name a:hover, #adresboek .element .element-content .list li .user_name a:focus {
-  color: inherit;
-}
-
-#adresboek .element .element-content .list li .user_email {
-  display: block;
-  color: #b5b5b5;
-  font-size: 11px;
-  font-weight: normal;
-  text-decoration: none;
-}
-
-#adresboek .element .element-content .list li .selected {
-  border-left: 5px solid #bbbbbb;
-}
-
-#adresboek .element .element-content .list li :hover {
-  background-color: #e0e4e7;
-}
-
-#adresboek .element .element-content .contact_buttons {
-  width: calc(100% - 16px);
 }
 
 @media screen and (min-width: 0px) and (max-width: 767px) {

@@ -36,7 +36,9 @@
                         <span class="icon-bar"></span>
                     </button>
                     <a class="navbar-brand" href="{{ url('/') }}">Administrator</a>
+                </div>
 
+                <div class="collapse navbar-collapse" id="app-navbar-collapse">
                     @if (!Auth::guest())
                         <ul class="nav navbar-nav navbar-left">
                             <li><a href="{{ url('/dashboard') }}">Dashboard</a></li>
@@ -44,9 +46,6 @@
                             <li><a href="{{ url('/betalingen') }}">iDeal Betalingen</a></li>
                         </ul>
                     @endif
-                </div>
-
-                <div class="collapse navbar-collapse" id="app-navbar-collapse">
                     <ul class="nav navbar-nav navbar-right">
                         <!-- Authentication Links -->
                         @if (Auth::guest())

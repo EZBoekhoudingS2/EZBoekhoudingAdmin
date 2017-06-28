@@ -22,7 +22,6 @@
             </div>
         </div>
         <h3 class="payments-no"><strong>Geen</strong> betalingen uit kwartaal {{ showQuarter }} van {{ showYear }}</h3>
-        <h3 class="payments-yes">Betalingen uit kwartaal {{ showQuarter }} van {{ showYear }}</h3>
         <div class="table">
             <div class="row table_header">
                 <div class="col-xs-1 text-left">Id</div>
@@ -30,7 +29,7 @@
                 <div class="col-xs-4">Gebruiker</div>
                 <div class="col-xs-2">Titel</div>
                 <div class="col-xs-3">Aanbieding</div>
-                <div class="col-xs-1">Bedrag incl.</div>
+                <div class="col-xs-1 text-right">Bedrag incl.</div>
             </div>
             <div id="betalingen_layers">
                 <div v-bind:id="'betaling_' + betaling.id" class="row table_layer" v-for="betaling in betalingen">
@@ -39,7 +38,7 @@
                     <div class="table_col col-xs-4">{{ betaling.bedrijfsnaam }} (<a v-bind:href="'/user/' + betaling.user_id" target="_blank">{{ betaling.email }}</a>)</div>
                     <div class="table_col col-xs-2">{{ betaling.titel }}</div>
                     <div class="table_col col-xs-3">{{ betaling.aanb }}</div>
-                    <div class="table_col col-xs-1">&euro; {{ betaling.bedrag_in }}</div>
+                    <div class="table_col col-xs-1 text-right">&euro; {{ betaling.bedrag_in }}</div>
                 </div>
             </div>
         </div>
@@ -82,11 +81,9 @@
                     if (this.betalingen.length === 0) {
                         $('.table').hide();
                         $('.payments-no').show();
-                        $('.payments-yes').hide();
                     } else {
                         $('.table').show();
                         $('.payments-no').hide();
-                        $('.payments-yes').show();
                     }
                     $('#loading_screen').hide();
                     this.showYear = this.currentYear;
