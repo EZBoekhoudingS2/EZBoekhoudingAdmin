@@ -10,15 +10,15 @@
                         <h4 class="modal-title" id="user_subs">Gebruikerssoorten</h4>
                     </div>
                     <div class="modal-body">
-                        @foreach ($subs as $subs_type)
-                            @foreach($subs_type as $sub_name)
-                                @if (!empty($sub_name['users']))
+                        @foreach ($subs as $subType)
+                            @foreach($subType as $subName)
+                                @if (!empty($subName['users']))
                                     <div class="abbo-box col-xs-6">
                                         <table class="col-xs-12">
                                             <tr>
-                                                <td class="abbo-header" colspan="2">{{ $sub_name['title'] }}</td>
+                                                <td class="abbo-header" colspan="2">{{ $subName['title'] }}</td>
                                             </tr>
-                                            @foreach ($sub_name['users'] as $sub)
+                                            @foreach ($subName['users'] as $sub)
                                                 <tr>
                                                     <td class="user-id">{{ $sub['id'] }}</td>
                                                     <td class="user-email">
@@ -38,59 +38,83 @@
                 </div>
             </div>
         </div>
-        <div class="dashboard-div col-xs-12 col-sm-6">
-            <div class="dashboard-user-count">
-                <h3 class="dashboard-header">Gebruikersaantallen</h3>
-                @foreach($user_count as $key => $value)
-                    <div class="user-count row">
-                        <div class="col-xs-10">{{ $key }} gebruikers:</div>
-                        <div class="user-count-num col-xs-2"><a href="#">{{ $value }}</a></div>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-        <div class="dashboard-div col-xs-12 col-sm-6">
-            <div class="dashboard-users">
-                <h3 class="dashboard-header">Alle gebruikers</h3>
-                <div class="form-group">
-                    <select class="selectpicker" id="user-dropdown" name="user" title="Selecteer een gebruiker..." data-width="100%">
-                        @foreach ($users as $user)
-                            <option value="{{ $user->id }}" name="{{ $user->id }}">{{ $user->email }}</option>
-                        @endforeach
-                    </select>
+        <div class="col-xs-12 col-md-6">
+            <div class="dashboard-panel">
+                <div class="panel-header">Gebruikerssoorten</div>
+                <div class="panel-content">
+                    <canvas id="userTypes" height="88"></canvas>
                 </div>
-                <a id="btn-id">
-                    <button class="btn btn-default" type="button">Bekijk</button>
-                </a>
             </div>
         </div>
-        <div class="dashboard-div col-xs-12 col-sm-6">
-            <div class="dashboard-user-count">
-                <h3 class="dashboard-header">Gebruikerssoorten</h3>
-                @foreach ($subs as $subs_type)
-                    @foreach ($subs_type as $sub)
-                        <div class="user-count sub-count row">
-                            <div class="col-xs-10">{{ $sub['title'] }}:</div>
-                            <div class="sub user-count-num col-xs-2" data-toggle="modal" data-target=".modal">
-                                <input class="active-count" type="hidden" value="{{ $sub[1] }}">
-                                <input class="non-active-count" type="hidden" value="{{ $sub[2] }}">
-                                <a class="user-count-active" data-toggle="popover" data-placement="left">{{ $sub[0] }}</a>
+        <div class="col-xs-12 col-md-6">
+            <div class="dashboard-panel">
+                <div class="panel-header">Abonnement aantallen</div>
+                <div class="panel-content">
+                    @foreach ($subs as $subs_type)
+                        @foreach ($subs_type as $sub)
+                            <div class="user-count sub-count row">
+                                <div class="col-xs-10">{{ $sub['title'] }}:</div>
+                                <div class="sub user-count-num col-xs-2" data-toggle="modal" data-target=".modal">
+                                    <input class="active-count" type="hidden" value="{{ $sub['active'] }}">
+                                    <input class="non-active-count" type="hidden" value="{{ $sub['non_active'] }}">
+                                    <a class="user-count-active" data-toggle="popover" data-placement="left">{{ $sub['sub_count'] }}</a>
+                                </div>
                             </div>
-                        </div>
+                        @endforeach
                     @endforeach
-                @endforeach
+                </div>
             </div>
         </div>
-        <div class="dashboard-div col-xs-12 col-sm-6">
-            <div class="dashboard-user-chart">
-                <h3 class="dashboard-header">Gebruikersgrafiek</h3>
-                <canvas id="userChart" width="250" height="200"></canvas>
+        <div class="col-xs-12 col-md-4">
+            <div class="dashboard-panel">
+                <div class="panel-header">Totaal aantal gebruikers</div>
+                <div class="panel-content">
+                    <div class="panel-number">{{ count($users) }}</div>
+                    <div class="text-center">gebruikers</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-4">
+            <div class="dashboard-panel">
+                <div class="panel-header">Actieve gebruikers</div>
+                <div class="panel-content">
+                    <div class="panel-number">{{ $user_count['Actieve'] }}</div>
+                    <div class="text-center">gebruikers</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-4">
+            <div class="dashboard-panel">
+                <div class="panel-header">Niet-actieve gebruikers</div>
+                <div class="panel-content">
+                    <div class="panel-number">{{ count($users) - $user_count['Actieve'] }}</div>
+                    <div class="text-center">gebruikers</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12">
+            <div class="dashboard-panel">
+                <div class="panel-header">Abonnementen</div>
+                <div class="panel-content">
+                    <canvas id="userCount" height="75"></canvas>
+                </div>
             </div>
         </div>
     </div>
 @endsection
 @section('extra_js')
     <script>
+//        $(window).resize(function() {
+//            console.log($(this).width());
+//            if ($(this).width() < 960) {
+//                $("#userCount").removeAttr('height');
+//                userTypes.update();
+//            } else {
+//                $("#userCount").attr('height', '75');
+//                userTypes.update();
+//            }
+//        });
+
         // Verwijst je naar de juiste pagina
         $('#btn-id').on('click', function() {
             var id = $('#user-dropdown').val();
@@ -110,38 +134,82 @@
             });
         });
 
-        var sub_labels = [];
-        var sub_values = [];
+        var subCountLabels = [];
+        var subCountValues = [];
         @foreach ($subs as $subs_type)
             @foreach ($subs_type as $sub)
-                sub_labels.push('{{ $sub['title'] }}');
-                sub_values.push('{{ $sub[0] }}');
+                subCountLabels.push('{{ $sub['title'] }}');
+                subCountValues.push('{{ $sub['sub_count'] }}');
             @endforeach
         @endforeach
 
-        const chart = $('#userChart');
-        var userChart = new Chart(chart, {
-            type: 'pie',
+        var userTypesLabels = [];
+        var userTypesValues = [];
+        @foreach($user_count as $key => $value)
+            userTypesLabels.push('{{ $key }}');
+            userTypesValues.push('{{ $value }}');
+        @endforeach
+
+        var userCount = new Chart($('#userCount'), {
+            type: 'bar',
             data: {
-                labels: sub_labels,
+                labels: subCountLabels,
                 datasets: [{
                     backgroundColor: [
-                        '#00008b',
-                        '#f1c40f',
-                        '#e67e22',
-                        '#16a085',
-                        '#2980b9',
-                        '#ff2828',
-                        '#ff1493',
-                        '#a0522d'
+                        '#f06292',
+                        '#ffb74d',
+                        '#fff176',
+                        '#aed581',
+                        '#7986cb',
+                        '#ba68c8',
+                        '#a1887f'
                     ],
-                    data: sub_values
+                    data: subCountValues
                 }]
             },
             options: {
-                cutoutPercentage: 60,
                 animation: {
                     animateScale: true
+                },
+                legend: {
+                    display: false
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            userCallback: function(label, index, labels) {
+                                if (Math.floor(label) === label) {
+                                    return label;
+                                }
+                            }
+                        }
+                    }]
+                }
+            }
+        });
+
+        var userTypes = new Chart($('#userTypes'), {
+            type: 'pie',
+            data: {
+                labels: userTypesLabels,
+                datasets: [{
+                    backgroundColor: [
+                        '#f06292',
+                        '#ffb74d',
+                        '#fff176',
+                        '#aed581',
+                        '#7986cb',
+                        '#ba68c8',
+                        '#a1887f'
+                    ],
+                    data: userTypesValues
+                }]
+            },
+            options: {
+                animation: {
+                    animateScale: true,
+                    duration: 0
                 }
             }
         });

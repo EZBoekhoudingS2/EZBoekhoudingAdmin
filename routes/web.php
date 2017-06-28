@@ -14,20 +14,30 @@
 Route::get('/', function () {
     return redirect('dashboard');
 });
+Route::get('/user', function () {
+    return redirect('users');
+});
 
 Auth::routes();
 
 Route::get('/dashboard',                'DashboardController@index');
-Route::get('/user/{id}',                'UserController@index');
-Route::post('/user/{id}',               'UserController@update');
-Route::get('/user/{id}/{factuur_id}',   'UserController@fetchFacturen');
-Route::post('/user/{id}/{factuur_id}',  'UserController@updateFacturen');
-Route::get('/fetch_fackosten',          'UserController@fetchFackosten');
-Route::get('/add_fackosten',            'UserController@addFackosten');
-Route::get('/update_fackosten',         'UserController@updateFackosten');
-Route::get('/remove_fackosten',         'UserController@removeFackosten');
-Route::get('/fetch_kosten',             'UserController@fetchKosten');
-Route::get('/update_kosten',            'UserController@updateKosten');
-Route::get('/fetch_urenkm',             'UserController@fetchUrenkm');
-Route::get('/update_urenkm',            'UserController@updateUrenkm');
-Route::get('/remove_row',               'UserController@removeRow');
+Route::get('/users',                    'UsersController@index');
+Route::get('/users/subs',               'UsersController@subs');
+Route::get('/users/fetch_all',          'UsersController@fetchAll');
+Route::get('/users/fetch_user',         'UsersController@fetchUser');
+Route::get('/user/{id}',                'UserInfoController@index');
+Route::post('/user/{id}',               'UserInfoController@update');
+Route::get('/user/{id}/{factuur_id}',   'UserInfoController@fetchFacturen');
+Route::post('/user/{id}/{factuur_id}',  'UserInfoController@updateFacturen');
+Route::get('/fetch_fackosten',          'UserInfoController@fetchFackosten');
+Route::get('/add_fackosten',            'UserInfoController@addFackosten');
+Route::get('/update_fackosten',         'UserInfoController@updateFackosten');
+Route::get('/remove_fackosten',         'UserInfoController@removeFackosten');
+Route::get('/fetch_kosten',             'UserInfoController@fetchKosten');
+Route::get('/update_kosten',            'UserInfoController@updateKosten');
+Route::get('/fetch_urenkm',             'UserInfoController@fetchUrenkm');
+Route::get('/update_urenkm',            'UserInfoController@updateUrenkm');
+Route::get('/remove_row',               'UserInfoController@removeRow');
+Route::get('/incasso/toggle',           'UserInfoController@toggle');
+Route::get('/betalingen',               'BetalingenController@index');
+Route::get('/betalingen/api',           'BetalingenController@api');

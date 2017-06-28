@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use DB;
 
-class UserController extends Controller
+class UserInfoController extends Controller
 {
 
     public $komma_getallen_regex = '/^\d{1,}(,?\d{1,2})?$/'; // Regex accepteert komma getallen
@@ -18,6 +18,8 @@ class UserController extends Controller
     // Weergeeft de algemene pagina
     public function index($user_id)
     {
+        $sepa_incasso   = DB::table('Incasso')->leftJoin('Sepa_incasso', 'Incasso.id', '=', 'Sepa_incasso.incasso_id')->select('Incasso.beschrijving AS beschrijving_incasso', 'Sepa_incasso.*')->where(['Sepa_incasso.user_id' => $user_id])->get();
+        $betalingen     = DB::connection('mysql2')->table('betaling_uniek')->leftJoin('users', 'betaling_uniek.user_id', '=', 'users.id')->select('users.id AS user_id', 'users.bedrijfsnaam', 'users.email', 'betaling_uniek.id', 'betaling_uniek.titel', 'betaling_uniek.omschr', 'betaling_uniek.aanb', 'betaling_uniek.datum', 'betaling_uniek.bedrag_in')->where(['betaling_uniek.user_id' => $user_id])->get();
         $show_user      = DB::connection('mysql2')->table('users')->select('id', 'email', 'vnaam', 'anaam', 'straat', 'postcode', 'plaats', 'telefoon', 'bedrijfsnaam', 'iban', 'iban_naam', 'btw', 'kvk')->where(['id' => $user_id])->get();
         $current_sub    = DB::connection('mysql2')->table('betaling_uniek')->where(['user_id' => $user_id, 'vld_time' => (DB::connection('mysql2')->table('betaling_uniek')->max('vld_time'))])->get();
         $facturen       = DB::connection('mysql2')->table('facturen')->where(['klant_id' => $user_id])->orderBy('time', 'desc')->get();
@@ -29,15 +31,16 @@ class UserController extends Controller
         $kilometers     = DB::connection('mysql2')->table('km')->where(['klant' => $user_id])->get();
         $korting        = DB::connection('mysql2')->table('korting_generiek')->get();
         $kosten_cat     = DB::connection('mysql2')->table('kosten_cat')->get();
+        $currently      = '(huidig)';
         $abonnementen   = array();
         $options        = array();
         $rules          = array();
         $trial          = array();
         $maandjaar      = null;
-        $currently      = '(huidig)';
         $trial_info     = '';
         $abbo           = '';
-        $max_rows       = 20;
+        $maxRows        = 20;
+        $maxRowsB       = 5;
         $label          = array(
             'id'            => 'Id',
             'email'         => 'Emailadres',
@@ -53,6 +56,22 @@ class UserController extends Controller
             'btw'           => 'Btw',
             'kvk'           => 'KvK'
         );
+
+        foreach ($sepa_incasso as $item) {
+            $item->bedrag   = $this->punt_naar_komma($item->bedrag);
+            $item->succes   = ($item->succes == false)
+                ? '<a href="#"><input type="hidden" value="' . $item->succes . '"><img src="/images/busy.png"></a>'
+                : '<a href="#"><input type="hidden" value="' . $item->succes . '"><img src="/images/check.png"></a>';
+
+            $item->verlengt = ($item->verlengt == false)
+                ? '<a href="#"><input type="hidden" value="' . $item->verlengt . '"><img src="/images/busy.png"></a>'
+                : '<a href="#"><input type="hidden" value="' . $item->verlengt . '"><img src="/images/check.png"></a>';
+        }
+
+//        echo '<pre>';
+//        print_r($sepa_incasso);
+//        echo '</pre>';
+//        exit;
 
         if (!empty($incasso[0]) && $incasso[0]->active == 1) {
             for ($i = 0; $i < count($betaling); $i++) {
@@ -182,6 +201,10 @@ class UserController extends Controller
             }
         }
 
+        foreach ($betalingen as $betaling) {
+            $betaling->bedrag_in = $this->punt_naar_komma($betaling->bedrag_in);
+        }
+
         foreach ($kosten as $kost) {
             $kost->btw_bedrag = $this->punt_naar_komma($kost->btw_bedrag);
             foreach ($kosten_cat as $cat) {
@@ -207,7 +230,8 @@ class UserController extends Controller
             }
             $uur->km = $this->punt_naar_komma($uur->km);
         }
-        return view('user', compact('label', 'month', 'user_id', 'trial', 'show_user', 'current_user', 'abonnementen', 'options', 'trial_info', 'facturen', 'kosten', 'kosten_cat', 'uren', 'max_rows'));
+
+        return view('userinfo', compact('label', 'month', 'user_id', 'trial', 'sepa_incasso', 'betalingen', 'show_user', 'current_user', 'abonnementen', 'options', 'trial_info', 'facturen', 'kosten', 'kosten_cat', 'uren', 'maxRows', 'maxRowsB'));
     }
 
     // Update de algemene pagina
@@ -712,5 +736,11 @@ class UserController extends Controller
                 DB::connection('mysql2')->table('km')->where(['uren_id' => $_GET['id'], 'klant' => $_GET['user_id']])->delete();
                 break;
         }
+    }
+
+    public function toggle()
+    {
+        DB::table('Sepa_incasso')->where(['id' => $_GET['id']], ['user_id' => $_GET['user_id']])
+            ->update(['succes'  => $_GET['voltooid']]);
     }
 }

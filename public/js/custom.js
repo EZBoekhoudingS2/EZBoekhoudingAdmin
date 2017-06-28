@@ -38,6 +38,28 @@ function komma_naar_punt(bedrag) {
     }
 }
 
+function getQuarterByMonth(maand) {
+    var kwartaal = null;
+    maand = String(maand);
+    switch(true) {
+        case maand >= '1' && maand <= '3':
+            kwartaal = 1;
+            break;
+        case maand >= '4' && maand <= '6':
+            kwartaal = 2;
+            break;
+        case maand >= '7' && maand <= '9':
+            kwartaal = 3;
+            break;
+        case maand >= '10' && maand <= '12':
+            kwartaal = 4;
+            break;
+        default:
+            kwartaal = false;
+    }
+    return kwartaal;
+}
+
 function getRandomColor() {
     var letters = '0123456789ABCDEF';
     var color = '#';

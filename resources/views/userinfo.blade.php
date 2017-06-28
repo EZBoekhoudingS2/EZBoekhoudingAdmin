@@ -14,8 +14,10 @@
         {{ $success }}
     @endif
     <div id="user">
+        <h3>Klantgegevens van <b>{{ $current_user[0]->vnaam . ' ' . $current_user[0]->anaam }}</b> {!! $trial_info !!}</h3>
         <ul class="nav nav-tabs">
             <li role="presentation" class="active"><a data-toggle="tab" href="#algemeen">Algemeen</a></li>
+            <li role="presentation"><a data-toggle="tab" href="#betalingen">Betalingen</a></li>
             <li role="presentation"><a data-toggle="tab" href="#facturen">Facturen</a></li>
             <li role="presentation"><a data-toggle="tab" href="#kosten">Kosten</a></li>
             <li role="presentation"><a data-toggle="tab" href="#urenkm">Uren & Km's</a></li>
@@ -23,7 +25,6 @@
         <div class="tab-content">
             {{--ALGEMENE INFORMATIE PAGINA--}}
             <div role="tabpanel" class="tab-pane fade in active" id="algemeen">
-                <h3>Klantgegevens van <b>{{ $current_user[0]->vnaam . ' ' . $current_user[0]->anaam }}</b> {!! $trial_info !!}</h3>
                 <form action="" method="post">
                     {{ csrf_field() }}
                     <input type="hidden" name="user_id" id="user_id" value="{{ $user_id }}">
@@ -68,20 +69,116 @@
                             </select>
                         </div>
                     </div>
-                    <input class="btn btn-default" type="submit" value="Opslaan">
+                    <input class="btn btn-default save-user" type="submit" value="Opslaan">
                 </form>
+            </div>
+
+            {{--BETALINGEN PAGINA--}}
+            <div role="tabpanel" class="tab-pane fade" id="betalingen">
+                <div class="col-xs-12">
+                    @if (empty($betalingen[0]))
+                        <p class="empty-alert">Er zijn nog geen iDeal betalingen doorgevoerd door deze gebruiker!</p>
+                    @else
+                        <div class="table">
+                            <div class="row table_header">
+                                <div class="col-xs-2 text-left">Datum</div>
+                                <div class="col-xs-8 text-left">Titel</div>
+                                <div class="col-xs-2 text-right">Bedrag incl.</div>
+                            </div>
+                            <div id="betaling_layers">
+                                <div role="tabpanel" class="tab-pane fade in active" id="betaling_page1">
+                                    @for ($i = 1; $i <= count($betalingen); $i++)
+                                        <div id="betalingen_{{ $betalingen[$i - 1]->id }}" class="row table_layer">
+                                            <div class="table_col col-xs-2 text-left">{{ $betalingen[$i - 1]->datum }}</div>
+                                            <div class="table_col col-xs-8 text-left">{{ $betalingen[$i - 1]->titel }}</div>
+                                            <div class="table_col col-xs-2 text-right">&euro; {{ $betalingen[$i - 1]->bedrag_in }}</div>
+                                        </div>
+                                        @if ($i % $maxRowsB == 0)
+                                            </div>
+                                            <div role="tabpanel" class="tab-pane fade" id="betaling_page{{ ceil($i / $maxRowsB) + 1 }}">
+                                            @continue
+                                        @endif
+                                    @endfor
+                                </div>
+                            </div>
+                        </div>
+                        <div class="page_list">
+                            <ul id="betaling_pagination" class="pagination">
+                                <li class="first_page" role="presentation" aria-label="First"><span aria-hidden="true">&laquo;</span></li>
+                                <li class="previous_page" role="presentation" aria-label="Previous"><span aria-hidden="true">&lt;</span></li>
+                                <li class="more_left disabled" role="presentation"><a aria-expanded="true">...</a></li>
+                                @for ($j = 1; $j <= ceil(count($betalingen) / $maxRowsB); $j++)
+                                    <li class="pages" role="presentation"><a data-toggle="tab" href="#betaling_page{{ $j }}">{{ $j }}</a></li>
+                                @endfor
+                                <li class="more_right disabled" role="presentation"><a aria-expanded="true">...</a></li>
+                                <li class="next_page" role="presentation" aria-label="Next"><span aria-hidden="true">&gt;</span></li>
+                                <li class="last_page" role="presentation" aria-label="Last"><span aria-hidden="true">&raquo;</span></li>
+                            </ul>
+                        </div>
+                    @endif
+                    @if (empty($betalingen[0]))
+                        <p class="empty-alert">Er zijn nog geen incasso's doorgevoerd door deze gebruiker!</p>
+                    @else
+                        <div class="table">
+                            <div class="row table_header">
+                                <div class="col-xs-2 text-left">Beschrijving incasso</div>
+                                <div class="col-xs-2">Referentie</div>
+                                <div class="col-xs-2">Beschrijving</div>
+                                <div class="col-xs-1">Datum</div>
+                                <div class="col-xs-2">Factuurnummer</div>
+                                <div class="col-xs-1">Voltooid</div>
+                                <div class="col-xs-1">Verlengd</div>
+                                <div class="col-xs-1 text-right">Bedrag</div>
+                            </div>
+                            <div id="incasso_layers">
+                                <div role="tabpanel" class="tab-pane fade in active" id="incasso_page1">
+                                    @for ($i = 1; $i <= count($sepa_incasso); $i++)
+                                        <div id="incasso_{{ $sepa_incasso[$i - 1]->id }}" class="row table_layer">
+                                            <input class="incasso_id" type="hidden" value="{{ $sepa_incasso[$i - 1]->id }}">
+                                            <div class="table_col col-xs-2 beschrijving_incasso text-left">{{ $sepa_incasso[$i - 1]->beschrijving_incasso }}</div>
+                                            <div class="table_col col-xs-2 ref">{{ $sepa_incasso[$i - 1]->ref }}</div>
+                                            <div class="table_col col-xs-2 beschrijving">{{ $sepa_incasso[$i - 1]->beschrijving }}</div>
+                                            <div class="table_col col-xs-1 collection_date">{{ $sepa_incasso[$i - 1]->collection_date }}</div>
+                                            <div class="table_col col-xs-2 mandate_id">{{ $sepa_incasso[$i - 1]->mandate_id }}</div>
+                                            <div class="table_col col-xs-1 succes">{!! $sepa_incasso[$i - 1]->succes !!}</div>
+                                            <div class="table_col col-xs-1 verlegt">{!! $sepa_incasso[$i - 1]->verlengt !!}</div>
+                                            <div class="table_col col-xs-1 bedrag text-right">&euro; {{ $sepa_incasso[$i - 1]->bedrag }}</div>
+                                        </div>
+                                        @if ($i % $maxRowsB == 0)
+                                            </div>
+                                            <div role="tabpanel" class="tab-pane fade" id="incasso_page{{ ceil($i / $maxRowsB) + 1 }}">
+                                            @continue
+                                        @endif
+                                    @endfor
+                                </div>
+                            </div>
+                        </div>
+                        <div class="page_list">
+                            <ul id="incasso_pagination" class="pagination">
+                                <li class="first_page" role="presentation" aria-label="First"><span aria-hidden="true">&laquo;</span></li>
+                                <li class="previous_page" role="presentation" aria-label="Previous"><span aria-hidden="true">&lt;</span></li>
+                                <li class="more_left disabled" role="presentation"><a aria-expanded="true">...</a></li>
+                                @for ($j = 1; $j <= ceil(count($sepa_incasso) / $maxRowsB); $j++)
+                                    <li class="pages" role="presentation"><a data-toggle="tab" href="#incasso_page{{ $j }}">{{ $j }}</a></li>
+                                @endfor
+                                <li class="more_right disabled" role="presentation"><a aria-expanded="true">...</a></li>
+                                <li class="next_page" role="presentation" aria-label="Next"><span aria-hidden="true">&gt;</span></li>
+                                <li class="last_page" role="presentation" aria-label="Last"><span aria-hidden="true">&raquo;</span></li>
+                            </ul>
+                        </div>
+                    @endif
+                </div>
             </div>
 
             {{--FACTUREN-OVERZICHT PAGINA--}}
             <div role="tabpanel" class="tab-pane fade" id="facturen">
                 @if (empty($facturen[0]))
-                    <p class="empty-alert">Er zijn nog geen facturen verstuurd door <b>{{ $current_user[0]->vnaam }} {{ $current_user[0]->anaam }}</b>!</p>
+                    <p class="empty-alert">Er zijn nog geen facturen verstuurd door deze gebruiker!</p>
                 @else
-                    <h3>Verstuurde facturen van <b>{{ $current_user[0]->vnaam }} {{ $current_user[0]->anaam }}</b></h3>
                     <div class="table">
                         <div class="row table_header">
                             <div class="col-xs-9">
-                                <div class="col-xs-1 text-left">ID</div>
+                                <div class="col-xs-1 text-left">Id</div>
                                 <div class="col-xs-2">Datum</div>
                                 <div class="col-xs-2">Factuurnummer</div>
                                 <div class="col-xs-2">Type</div>
@@ -115,9 +212,9 @@
                                             </div>
                                         </div>
                                     </div>
-                                    @if ($i % $max_rows == 0)
+                                    @if ($i % $maxRows == 0)
                                         </div>
-                                        <div role="tabpanel" class="tab-pane fade" id="factuur_page{{ ceil($i / $max_rows) + 1 }}">
+                                        <div role="tabpanel" class="tab-pane fade" id="factuur_page{{ ceil($i / $maxRows) + 1 }}">
                                         @continue
                                     @endif
                                 @endfor
@@ -125,12 +222,12 @@
                         </div>
                     </div>
                     <div class="page_list">
-                        <ul id="fac_pagination" class="pagination">
+                        <ul id="factuur_pagination" class="pagination">
                             <li class="first_page" role="presentation" aria-label="First"><span aria-hidden="true">&laquo;</span></li>
                             <li class="previous_page" role="presentation" aria-label="Previous"><span aria-hidden="true">&lt;</span></li>
                             <li class="more_left disabled" role="presentation"><a aria-expanded="true">...</a></li>
-                            @for ($j = 1; $j <= ceil(count($facturen) / $max_rows); $j++)
-                                <li class="fac_pages" role="presentation"><a data-toggle="tab" href="#factuur_page{{ $j }}">{{ $j }}</a></li>
+                            @for ($j = 1; $j <= ceil(count($facturen) / $maxRows); $j++)
+                                <li class="pages" role="presentation"><a data-toggle="tab" href="#factuur_page{{ $j }}">{{ $j }}</a></li>
                             @endfor
                             <li class="more_right disabled" role="presentation"><a aria-expanded="true">...</a></li>
                             <li class="next_page" role="presentation" aria-label="Next"><span aria-hidden="true">&gt;</span></li>
@@ -233,12 +330,11 @@
             </div>
             <div role="tabpanel" class="tab-pane fade" id="kosten">
                 @if (empty($kosten[0]))
-                    <p class="empty-alert">Er zijn nog geen kosten opgevoerd door <b>{{ $current_user[0]->vnaam }} {{ $current_user[0]->anaam }}</b>!</p>
+                    <p class="empty-alert">Er zijn nog geen kosten opgevoerd door deze gebruiker!</p>
                 @else
-                    <h3>Opgevoerde kosten van <b>{{ $current_user[0]->vnaam }} {{ $current_user[0]->anaam }}</b></h3>
                     <div class="table">
                         <div class="row table_header">
-                            <div class="col-xs-1 text-left">ID</div>
+                            <div class="col-xs-1 text-left">Id</div>
                             <div class="col-xs-1">Datum</div>
                             <div class="col-xs-2">Omschrijving</div>
                             <div class="col-xs-3">Categorie</div>
@@ -248,7 +344,7 @@
                             <div class="col-xs-1 text-right">Opties</div>
                         </div>
                         <div id="kosten_layers">
-                            <div role="tabpanel" class="tab-pane fade in active" id="kost_page1">
+                            <div role="tabpanel" class="tab-pane fade in active" id="kosten_page1">
                                 @for ($i = 1; $i <= count($kosten); $i++)
                                     <div id="kosten_{{ $kosten[$i - 1]->id }}" class="row table_layer">
                                         <div class="table_col col-xs-1 text-left id">{{ $kosten[$i - 1]->id }}</div>
@@ -263,9 +359,9 @@
                                             <a onclick="removeRow({{ $kosten[$i - 1]->id }}, 'kosten')"><img src="{{ url('images/busy.png') }}" title="Verwijderen"></a>
                                         </div>
                                     </div>
-                                    @if ($i % $max_rows == 0)
+                                    @if ($i % $maxRows == 0)
                                         </div>
-                                        <div role="tabpanel" class="tab-pane fade" id="kost_page{{ ceil($i / $max_rows) + 1 }}">
+                                        <div role="tabpanel" class="tab-pane fade" id="kosten_page{{ ceil($i / $maxRows) + 1 }}">
                                         @continue
                                     @endif
                                 @endfor
@@ -273,12 +369,12 @@
                         </div>
                     </div>
                     <div class="page_list">
-                        <ul id="kost_pagination" class="pagination">
+                        <ul id="kosten_pagination" class="pagination">
                             <li class="first_page" role="presentation" aria-label="First"><span aria-hidden="true">&laquo;</span></li>
                             <li class="previous_page" role="presentation" aria-label="Previous"><span aria-hidden="true">&lt;</span></li>
                             <li class="more_left disabled" role="presentation"><a aria-expanded="true">...</a></li>
-                            @for ($j = 1; $j <= ceil(count($kosten) / $max_rows); $j++)
-                                <li class="kost_pages" role="presentation"><a data-toggle="tab" href="#kost_page{{ $j }}">{{ $j }}</a></li>
+                            @for ($j = 1; $j <= ceil(count($kosten) / $maxRows); $j++)
+                                <li class="pages" role="presentation"><a data-toggle="tab" href="#kosten_page{{ $j }}">{{ $j }}</a></li>
                             @endfor
                             <li class="more_right disabled" role="presentation"><a aria-expanded="true">...</a></li>
                             <li class="next_page" role="presentation" aria-label="Next"><span aria-hidden="true">&gt;</span></li>
@@ -335,12 +431,11 @@
             </div>
             <div role="tabpanel" class="tab-pane fade" id="urenkm">
                 @if (empty($uren[0]))
-                    <p class="empty-alert">Er zijn nog geen uren en kilometers opgevoerd door <b>{{ $current_user[0]->vnaam }} {{ $current_user[0]->anaam }}</b>!</p>
+                    <p class="empty-alert">Er zijn nog geen uren en kilometers opgevoerd door deze gebruiker!</p>
                 @else
-                    <h3>Opgevoerde uren en kilometers van <b>{{ $current_user[0]->vnaam }} {{ $current_user[0]->anaam }}</b></h3>
                     <div class="table">
                         <div class="row table_header">
-                            <div class="col-xs-1 text-left">ID</div>
+                            <div class="col-xs-1 text-left">Id</div>
                             <div class="col-xs-1">Datum</div>
                             <div class="col-xs-3">Omschrijving</div>
                             <div class="col-xs-2">Aantal uren</div>
@@ -363,9 +458,9 @@
                                             <a onclick="removeRow({{ $uren[$i - 1]->id }}, 'urenkm')"><img src="{{ url('images/busy.png') }}" title="Verwijderen"></a>
                                         </div>
                                     </div>
-                                    @if ($i % $max_rows == 0)
+                                    @if ($i % $maxRows == 0)
                                         </div>
-                                        <div role="tabpanel" class="tab-pane fade" id="urenkm_page{{ ceil($i / $max_rows) + 1 }}">
+                                        <div role="tabpanel" class="tab-pane fade" id="urenkm_page{{ ceil($i / $maxRows) + 1 }}">
                                         @continue
                                     @endif
                                 @endfor
@@ -377,8 +472,8 @@
                             <li class="first_page" role="presentation" aria-label="First"><span aria-hidden="true">&laquo;</span></li>
                             <li class="previous_page" role="presentation" aria-label="Previous"><span aria-hidden="true">&lt;</span></li>
                             <li class="more_left disabled" role="presentation"><a aria-expanded="true">...</a></li>
-                            @for ($j = 1; $j <= ceil(count($uren) / $max_rows); $j++)
-                                <li class="urenkm_pages" role="presentation"><a data-toggle="tab" href="#urenkm{{ $j }}">{{ $j }}</a></li>
+                            @for ($j = 1; $j <= ceil(count($uren) / $maxRows); $j++)
+                                <li class="pages" role="presentation"><a data-toggle="tab" href="#urenkm{{ $j }}">{{ $j }}</a></li>
                             @endfor
                             <li class="more_right disabled" role="presentation"><a aria-expanded="true">...</a></li>
                             <li class="next_page" role="presentation" aria-label="Next"><span aria-hidden="true">&gt;</span></li>
@@ -393,23 +488,28 @@
 @section('extra_js')
     <script>
         // Globale variable van het maximaal aantal pagina's dat hij laat zien
-        const max_pages = 10;
-        const user_id = $('#user_id').val();
+        const max_pages         = 10;
+        const user_id           = $('#user_id').val();
+        const selected_abbo     = $('#abbos-dropdown').val();
+        const paginas           = ['betaling', 'incasso', 'factuur', 'kosten', 'urenkm'];
 
         //Veranderd de Bedrag incl. input zodra er iets veranderd
         function btwCheck(where) {
-            var bedrag = $('#kosten_bedrag');
-            var btw_bedrag = $('#kosten_btw_bedrag').val();
-            var btw_tarief = $('#kosten_btw_tarief').val();
-            btw_tarief === 'vrij' ? btw_tarief = 0 : btw_tarief;
+            var bedrag          = $('#kosten_bedrag');
+            var btw_bedrag      = $('#kosten_btw_bedrag').val();
+            var btw_tarief      = $('#kosten_btw_tarief').val();
+            btw_tarief          = (btw_tarief === 'vrij') ? 0 : btw_tarief;
 
             // Checkt of de dropdown of inputveld veranderd is
-            if (where === 'select') {
-                bedrag.val(punt_naar_komma((komma_naar_punt(btw_bedrag) * (btw_tarief / 100 + 1)).toFixed(2)));
-            } else if (where === 'input') {
-                btw_bedrag.val(punt_naar_komma((komma_naar_punt(btw_bedrag) / 100 * (100 + parseInt(btw_tarief))).toFixed(2)));
-            } else {
-                btw_bedrag.val('');
+            switch(where) {
+                case 'select':
+                    bedrag.val(punt_naar_komma((komma_naar_punt(btw_bedrag) * (btw_tarief / 100 + 1)).toFixed(2)));
+                    break;
+                case 'input':
+                    btw_bedrag.val(punt_naar_komma((komma_naar_punt(btw_bedrag) / 100 * (100 + parseInt(btw_tarief))).toFixed(2)));
+                    break;
+                default:
+                    btw_bedrag.val('');
             }
         }
 
@@ -418,47 +518,49 @@
             $('#' + page + 'Modal').find('.loading').css('display', 'block').end().find('.modal-form').css('display', 'none');
             $('#' + page + 'Edit').addClass('disabled');
             $('#' + page + 'ModalTitle').find('span').text('');
-                $.ajax({
-                    url: '/fetch_' + page,
-                    data: {'id': row_id},
-                    success: function(data) {
-                        var row = data[0];
-                        switch(page) {
-                            case 'kosten':
-                                $('#' + page + 'ModalTitle').find('span').text(row.id);
-                                $('#' + page + '_id').val(row.id);
-                                $('#' + page + '_datum').val(row.datum);
-                                $('#' + page + '_omschrijving').val(row.omschrijving);
-                                $('#' + page + '_cat').val(row.cat);
-                                $('#' + page + '_prive').val(row.prive);
-                                $('#' + page + '_btw_bedrag').val(row.btw_bedrag);
-                                $('#' + page + '_btw_tarief').val(row.btw_tarief);
-                                $('#' + page + '_bedrag').val(row.bedrag);
-                                $('#' + page + '_buitenland').val(row.buitenland);
-                                $('.selectpicker').selectpicker('refresh');
-                                break;
-                            case 'urenkm':
-                                $('#' + page + 'ModalTitle').find('span').text(row.id);
-                                $('#' + page + '_id').val(row.id);
-                                $('#' + page + '_datum').val(row.datum);
-                                $('#' + page + '_omschrijving').val(row.omschrijving);
-                                $('#' + page + '_aantaluren').val(row.uren);
-                                if (row.km === null) {
-                                    $('#' + page + '_aantalkm').val('0.00');
-                                } else {
-                                    $('#' + page + '_aantalkm').val(row.km);
-                                }
-                                break;
-                            default:
-                                alert('An error has occured. Check your Console to view the error.');
-                                console.log('Unknown page "' + page + '" or unknown row ID "' + row_id + '"');
-                        }
-                    },
-                    complete: function() {
-                        $('#' + page + 'Modal').find('.loading').css('display', 'none').end().find('.modal-form').css('display', 'block');
-                        $('#' + page + 'Edit').removeClass('disabled');
+            $.ajax({
+                url: '/fetch_' + page,
+                data: {
+                    'id':   row_id
+                },
+                success: function(data) {
+                    var row = data[0];
+                    switch(page) {
+                        case 'kosten':
+                            $('#' + page + 'ModalTitle').find('span').text(row.id);
+                            $('#' + page + '_id').val(row.id);
+                            $('#' + page + '_datum').val(row.datum);
+                            $('#' + page + '_omschrijving').val(row.omschrijving);
+                            $('#' + page + '_cat').val(row.cat);
+                            $('#' + page + '_prive').val(row.prive);
+                            $('#' + page + '_btw_bedrag').val(row.btw_bedrag);
+                            $('#' + page + '_btw_tarief').val(row.btw_tarief);
+                            $('#' + page + '_bedrag').val(row.bedrag);
+                            $('#' + page + '_buitenland').val(row.buitenland);
+                            $('.selectpicker').selectpicker('refresh');
+                            break;
+                        case 'urenkm':
+                            $('#' + page + 'ModalTitle').find('span').text(row.id);
+                            $('#' + page + '_id').val(row.id);
+                            $('#' + page + '_datum').val(row.datum);
+                            $('#' + page + '_omschrijving').val(row.omschrijving);
+                            $('#' + page + '_aantaluren').val(row.uren);
+                            if (row.km === null) {
+                                $('#' + page + '_aantalkm').val('0.00');
+                            } else {
+                                $('#' + page + '_aantalkm').val(row.km);
+                            }
+                            break;
+                        default:
+                            alert('An error has occured. Check your Console to view the error.');
+                            console.log('Unknown page "' + page + '" or unknown row id "' + row_id + '"');
                     }
-                });
+                },
+                complete: function() {
+                    $('#' + page + 'Modal').find('.loading').css('display', 'none').end().find('.modal-form').css('display', 'block');
+                    $('#' + page + 'Edit').removeClass('disabled');
+                }
+            });
         }
 
         //Updatet rijen uit de database en op de pagina
@@ -469,16 +571,16 @@
                     $.ajax({
                         url: '/update_kosten',
                         data: {
-                            'user_id': user_id,
-                            'id': $('#' + page + '_id').val(),
-                            'datum': $('#' + page + '_datum').val(),
-                            'omschrijving': $('#' + page + '_omschrijving').val(),
-                            'cat': $('#' + page + '_cat').val(),
-                            'prive': $('#' + page + '_prive').val(),
-                            'btw_bedrag': $('#' + page + '_btw_bedrag').val(),
-                            'btw_tarief': $('#' + page + '_btw_tarief').val(),
-                            'bedrag': $('#' + page + '_bedrag').val(),
-                            'buitenland': $('#' + page + '_buitenland').val()
+                            'user_id':          user_id,
+                            'id':               $('#' + page + '_id').val(),
+                            'datum':            $('#' + page + '_datum').val(),
+                            'omschrijving':     $('#' + page + '_omschrijving').val(),
+                            'cat':              $('#' + page + '_cat').val(),
+                            'prive':            $('#' + page + '_prive').val(),
+                            'btw_bedrag':       $('#' + page + '_btw_bedrag').val(),
+                            'btw_tarief':       $('#' + page + '_btw_tarief').val(),
+                            'bedrag':           $('#' + page + '_bedrag').val(),
+                            'buitenland':       $('#' + page + '_buitenland').val()
                         },
                         error: function (data) {
                             var errors = data.responseJSON;
@@ -514,12 +616,12 @@
                     $.ajax({
                         url: '/update_urenkm',
                         data: {
-                            'user_id': user_id,
-                            'id': $('#' + page + '_id').val(),
-                            'datum': $('#' + page + '_datum').val(),
-                            'omschrijving': $('#' + page + '_omschrijving').val(),
-                            'aantaluren': $('#' + page + '_aantaluren').val(),
-                            'aantalkm': $('#' + page + '_aantalkm').val()
+                            'user_id':          user_id,
+                            'id':               $('#' + page + '_id').val(),
+                            'datum':            $('#' + page + '_datum').val(),
+                            'omschrijving':     $('#' + page + '_omschrijving').val(),
+                            'aantaluren':       $('#' + page + '_aantaluren').val(),
+                            'aantalkm':         $('#' + page + '_aantalkm').val()
                         },
                         error: function (data) {
                             var errors = data.responseJSON;
@@ -563,9 +665,9 @@
                 $.ajax({
                     url: '/remove_row',
                     data: {
-                        'page': page,
-                        'id': row_id,
-                        'user_id': user_id
+                        'page':     page,
+                        'id':       row_id,
+                        'user_id':  user_id
                     },
                     complete: function () {
                         $('#' + page + '_' + row_id).remove();
@@ -575,29 +677,51 @@
             }
         }
 
+        $('#incasso_layers').find('.succes').click(function() {
+            var voltooid    = '';
+            var input       = $(this).find('input[type=hidden]');
+            var id          = input.parents('.table_layer').find('.incasso_id').val();
+
+            switch(input.val()) {
+                case '0':
+                    voltooid = 1;
+                    input.parents('.table_layer').find('.succes').html('<a href="#"><input type="hidden" value="1"><img src="/images/check.png"></a>');
+                    break;
+                case '1':
+                    voltooid = 0;
+                    input.parents('.table_layer').find('.succes').html('<a href="#"><input type="hidden" value="0"><img src="/images/busy.png"></a>');
+                    break;
+            }
+
+            $.ajax({
+                url: '/incasso/toggle',
+                data: {
+                    'id':       id,
+                    'user_id':  user_id,
+                    'voltooid': voltooid
+                }
+            });
+        });
+
         $(document).ready(function() {
             // Als er een succesbericht is, verdwijnt ie in 5 seconden
             $('#success-message').fadeOut(5000);
 
             // Verbergt het laad icoontje en de tekst 'Opgeslagen!' in de Modals
-            $('#urenkmSaved').css('display', 'none');
-            $('#kostenSaved').css('display', 'none');
-            $('#facturenSaved').css('display', 'none');
-            $('#urenkmEdit').find('span').css('display', 'none');
-            $('#kostenEdit').find('span').css('display', 'none');
-            $('#facturenEdit').find('span').css('display', 'none');
-
-            // Zet het huidige abonnement in deze variabele
-            var selected_abbo = $('#abbos-dropdown').val();
+            $('#urenkmSaved').hide();
+            $('#kostenSaved').hide();
+            $('#facturenSaved').hide();
+            $('#urenkmEdit').find('span').hide();
+            $('#kostenEdit').find('span').hide();
+            $('#facturenEdit').find('span').hide();
 
             //Laat de goede dropdowns zien op de Algemene pagina
             jQuery(function($) {
+                // Als je de Trial dropdown veranderd
                 $('#trial-dropdown').on('change' ,function() {
                     if ($('#trial-dropdown').val() === '1') {
                         $('#active-dropdown').val('0').find('[value=1]').hide();
-                        $('#abbos-dropdown').find('option').hide().end().append(
-                            '<option id="trial-abbo" value="0_3_2" selected="selected">Deep Purple (volledig pakket voor 30 dagen)</option>'
-                        );
+                        $('#abbos-dropdown').find('option').hide().end().append('<option id="trial-abbo" value="0_3_2" selected="selected">Deep Purple (volledig pakket voor 30 dagen)</option>');
                     } else {
                         $('#active-dropdown').find('[value=1]').show();
                         $('#abbos-dropdown').find('option').show().end().find('#trial-abbo').remove().end().val(selected_abbo);
@@ -606,127 +730,71 @@
                 }).change();
             });
 
-            // Facturenpagina
-            var fac_pages = $('.fac_pages');
-            var fac_pagination = $('#fac_pagination');
-            var fac_layers = $('#factuur_layers').children();
-            fac_pages.first().addClass('active');
-            fac_layers.first().css('display', 'block');
-            if (fac_layers.last().children().length === 0) {
-                fac_layers.last().remove();
-                fac_pages.last().remove();
-            }
-            $.each(fac_pages, function(page) {
-                if (page < max_pages) {
-                    $(this).css('display', 'inline');
-                } else {
-                    $(this).css('display', 'none');
-                    fac_pagination.find('.more_right').css('display', 'inline');
+            $.each(paginas, function(key, pagina) {
+                const pagination      = $('#' + pagina + '_pagination');
+                const layers          = $('#' + pagina + '_layers').children();
+                const pages           = pagination.find('.pages');
+                pages.first().addClass('active');
+                layers.css('display', 'none');
+                layers.first().css('display', 'block');
+                if (layers.last().children().length === 0) {
+                    layers.last().remove();
+                    pages.last().remove();
+                }
+                $.each(pages, function(page) {
+                    // Als er meer pagina's zijn dan het maximaal aantal toegestaande pagina's, zet dan puntjes neer achter het laatste cijfer
+                    if (page < max_pages) {
+                        $(this).css('display', 'inline');
+                    } else {
+                        $(this).css('display', 'none');
+                        pagination.find('.more_right').css('display', 'inline');
+                    }
+                });
+                pagination.find('.first_page, .previous_page').addClass('disabled');
+                if (pages.length === 1) {
+                    pagination.find('.first_page, .previous_page, .next_page, .last_page').addClass('disabled');
                 }
             });
-            fac_pagination.find('.first_page, .previous_page').addClass('disabled');
-            if (fac_pages.length === 1) {
-                fac_pagination.find('.first_page, .previous_page, .next_page, .last_page').addClass('disabled');
-            }
-
-            // Kostenpagina
-            var kost_pages = $('.kost_pages');
-            var kost_pagination = $('#kost_pagination');
-            var kost_layers = $('#kosten_layers').children();
-            kost_pages.first().addClass('active');
-            kost_layers.first().css('display', 'block');
-            if (kost_layers.last().children().length === 0) {
-                kost_layers.last().remove();
-                kost_pages.last().remove();
-            }
-            $.each(kost_pages, function(page) {
-                if (page < max_pages) {
-                    $(this).css('display', 'inline');
-                } else {
-                    $(this).css('display', 'none');
-                    kost_pagination.find('.more_right').css('display', 'inline');
-                }
-            });
-            kost_pagination.find('.first_page, .previous_page').addClass('disabled');
-            if (kost_pages.length === 1) {
-                kost_pagination.find('.first_page, .previous_page, .next_page, .last_page').addClass('disabled');
-            }
-
-            // Uren en kilometers pagina
-            var urenkm_pages = $('.urenkm_pages');
-            var urenkm_pagination = $('#urenkm_pagination');
-            var urenkm_layers = $('#urenkm_layers').children();
-            urenkm_pages.first().addClass('active');
-            urenkm_layers.first().css('display', 'block');
-            if (urenkm_layers.last().children().length === 0) {
-                urenkm_layers.last().remove();
-                urenkm_pages.last().remove();
-            }
-            $.each(urenkm_pages, function(page) {
-                if (page < max_pages) {
-                    $(this).css('display', 'inline');
-                } else {
-                    $(this).css('display', 'none');
-                    urenkm_pagination.find('.more_right').css('display', 'inline');
-                }
-            });
-            urenkm_pagination.find('.first_page, .previous_page').addClass('disabled');
-            if (urenkm_pages.length === 1) {
-                urenkm_pagination.find('.first_page, .previous_page, .next_page, .last_page').addClass('disabled');
-            }
         });
 
         // Pagination functie
         $('.pagination li').click(function(a) {
-            var pages = '';
-            var layers = '';
-            var first_page = '1';
-            var visible_page = '';
-            var page = a.target.innerText;
-            var more_left = $(this).parent().find('.more_left');
-            var more_right = $(this).parent().find('.more_right');
+            var layers              = '';
+            const first_page        = '1';
+            const page              = a.target.innerText;
+            const pages             = $(this).parent().find('.pages');
+            const more_left         = $(this).parent().find('.more_left');
+            const more_right        = $(this).parent().find('.more_right');
+            const visible_page      = $(this).parent().find('.pages:visible');
+            const btnNextPrevious   = $(this).parent().find('.next_page, .last_page');
+            const btnFirstLast      = $(this).parent().find('.first_page, .previous_page');
 
             // Zet de juiste waarden in de variablen
-            switch(true) {
-                case $(this).parent().is('#fac_pagination'):
-                    pages = $('.fac_pages');
-                    visible_page = $('.fac_pages:visible');
-                    layers = $('#factuur_layers').children();
+            for (var p = 0; p < paginas.length; p++) {
+                if ($(this).parent().is('#' + paginas[p] + '_pagination')) {
+                    layers = $('#' + paginas[p] + '_layers').children();
                     break;
-                case $(this).parent().is('#kost_pagination'):
-                    pages = $('.kost_pages');
-                    visible_page = $('.kost_pages:visible');
-                    layers = $('#kosten_layers').children();
-                    break;
-                case $(this).parent().is('#urenkm_pagination'):
-                    pages = $('.urenkm_pages');
-                    visible_page = $('.urenkm_pages:visible');
-                    layers = $('#urenkm_layers').children();
-                    break;
+                }
             }
 
-            // Kijkt of er maar 1 pagina is
             if (pages.length === 1) {
-                $(this).parent().find('.first_page, .previous_page, .next_page, .last_page').addClass('disabled');
+                btnFirstLast.addClass('disabled');
+                btnNextPrevious.addClass('disabled');
             } else {
-                // Checkt of de knop waar je op drukt niet disabled is
-                if (!$(this).hasClass('disabled')) {
-                    // Als je op het eerste paginanummer klikt
+                if (!$(this).hasClass('disabled')) { // Als je op het eerste paginanummer klikt
                     if (page === first_page) {
-                        $(this).parent().find('.first_page, .previous_page').addClass('disabled');
+                        btnFirstLast.addClass('disabled');
                     } else {
-                        $(this).parent().find('.first_page, .previous_page').removeClass('disabled');
+                        btnFirstLast.removeClass('disabled');
                     }
-                    // Als je op het laatste paginanummer drukt
-                    if (page === String(pages.length)) {
-                        $(this).parent().find('.next_page, .last_page').addClass('disabled');
+                    if (page === String(pages.length)) { // Als je op het laatste paginanummer klikt
+                        btnNextPrevious.addClass('disabled');
                     } else {
-                        $(this).parent().find('.next_page, .last_page').removeClass('disabled');
+                        btnNextPrevious.removeClass('disabled');
                     }
 
                     // Loopt door elke rij op de pagina
                     for (var i = 0; i < layers.length; i++) {
-                        // Kijkt op welke knop gedrukt is
                         switch (page) {
                             case String(i + 1):
                                 layers.eq(i).css('display', 'block');
@@ -741,7 +809,7 @@
                                         pages.eq(j).removeClass('active');
                                         pages.eq(j - 1).addClass('active');
                                         if (pages.eq(j - 1).text() === first_page) {
-                                            $(this).parent().find('.first_page, .previous_page').addClass('disabled');
+                                            btnFirstLast.addClass('disabled');
                                         }
                                         if (more_left.css('display') === 'inline' && visible_page.first().prev().hasClass('active')) {
                                             visible_page.last().css('display', 'none');
@@ -768,7 +836,7 @@
                                         pages.eq(k).removeClass('active');
                                         pages.eq(k + 1).addClass('active');
                                         if (pages.eq(k + 1).text() === String(pages.length)) {
-                                            $(this).parent().find('.next_page, .last_page').addClass('disabled');
+                                            btnNextPrevious.addClass('disabled');
                                         }
                                         if (more_right.css('display') === 'inline' && visible_page.last().next().hasClass('active')) {
                                             visible_page.first().css('display', 'none');
@@ -792,7 +860,7 @@
                                 layers.first().addClass('active in');
                                 pages.eq(i + 1).removeClass('active');
                                 pages.first().addClass('active');
-                                $(this).parent().find('.first_page, .previous_page').addClass('disabled');
+                                btnFirstLast.addClass('disabled');
                                 if (more_left.css('display') === 'inline') {
                                     pages.css('display', 'inline');
                                     pages.slice(max_pages).css('display', 'none');
@@ -808,7 +876,7 @@
                                 layers.last().addClass('active in');
                                 pages.eq(i).removeClass('active');
                                 pages.last().addClass('active');
-                                $(this).parent().find('.next_page, .last_page').addClass('disabled');
+                                btnNextPrevious.addClass('disabled');
                                 if (more_right.css('display') === 'inline') {
                                     pages.css('display', 'none');
                                     pages.slice(-max_pages).css('display', 'inline');

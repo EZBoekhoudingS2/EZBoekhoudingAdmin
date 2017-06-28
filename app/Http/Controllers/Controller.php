@@ -55,6 +55,40 @@ class Controller extends BaseController
         }
     }
 
+    function calcDates($kwartaal, $jaar)
+    {
+        // Als kwartaal en jaar goed omgezet zijn naar Integers
+        if (($kwartaal = intval($kwartaal)) && ($jaar = intval($jaar))) {
+            switch ($kwartaal) {
+                case 1:
+                    $firstMonth = '01';
+                    $lastMonth = '03';
+                    break;
+                case 2:
+                    $firstMonth = '04';
+                    $lastMonth = '06';
+                    break;
+                case 3:
+                    $firstMonth = '07';
+                    $lastMonth = '09';
+                    break;
+                case 4:
+                    $firstMonth = '10';
+                    $lastMonth = '12';
+                    break;
+                default:
+                    die('Quarter is not valid');
+            }
+
+            $lastDay = cal_days_in_month(CAL_GREGORIAN, $lastMonth, $jaar);
+            return [
+                'firstDate' => '01' . '-' . $firstMonth . '-' . $jaar,
+                'lastDate' => $lastDay . '-' . $lastMonth . '-' . $jaar
+            ];
+        }
+        die('Month or year is not a number.');
+    }
+
     function kwartaal($date) {
         $date = explode('-', $date);
         if ($date[1] > 0 && $date[1] < 4) {
